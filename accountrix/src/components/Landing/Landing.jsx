@@ -5,6 +5,7 @@ import LoginRegister from '../Card/LoginRegister'
 
 import Whatweoffer from '../offering/whatweoffer'
 import FAQSection from '../FAQ/faqQuestion'
+import Footer from '../Footer/footer'
 function Landing() {
 
 
@@ -48,6 +49,7 @@ function Landing() {
             </div>
             <Whatweoffer />
             <FAQSection />
+            <Footer />
         </>
 
 

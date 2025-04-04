@@ -1,5 +1,6 @@
 import React from 'react'
 import { AnimatedListDemo } from '../codemagicui/animated-list';
+import { AnimatedBeamDemo } from '../codemagicui/animated-beam';
 const whatweoffer = () => {
     const offers = [
         {
@@ -29,7 +30,7 @@ const whatweoffer = () => {
         {
             id: 4,
             image: "/connection.png", // Ensure this image path is correct
-            title: "Connection",
+            title: "Diverse Connections",
             description:
                 "Receive applications and quickly connect with high-quality, relevant candidates",
             link: "#",
@@ -73,13 +74,17 @@ const whatweoffer = () => {
 
                         {offer.title && offer.title === "Job Posting" ? <div className="w-full h-40 flex items-center justify-center overflow-hidden">
                             <AnimatedListDemo />
-                        </div> : <div className="w-full h-40 flex items-center justify-center">
-                            <img
-                                src={offer.image}
-                                alt={offer.title}
-                                className="w-auto h-full object-contain"
-                            />
-                        </div>}
+                        </div> :
+                            offer.title && offer.title === "Diverse Connections" ? <div className="w-full h-40 flex items-center justify-center overflow-hidden">
+                                <AnimatedBeamDemo />
+                            </div> : <div className="w-full h-40 flex items-center justify-center">
+                                <img
+                                    src={offer.image}
+                                    alt={offer.title}
+                                    className="w-auto h-full object-contain"
+                                />
+                            </div>
+                        }
                         <div className=''>
                             <h3 className="text-xl font-semibold text-gray-900 mt-4">
                                 {offer.title}
