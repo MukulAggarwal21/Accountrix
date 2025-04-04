@@ -86,7 +86,7 @@ export default function LoginRegister() {
                 </form>
                 
             )}
-                                <BorderBeam duration={8} size={100} />
+                                {/* <BorderBeam duration={8} size={100} /> */}
 
         </div>
     )
