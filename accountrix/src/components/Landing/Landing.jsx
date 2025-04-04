@@ -4,6 +4,7 @@ import Navbar from '../Navbar'
 import LoginRegister from '../Card/LoginRegister'
 
 import Whatweoffer from '../offering/whatweoffer'
+import FAQSection from '../FAQ/faqQuestion'
 function Landing() {
 
 
@@ -46,7 +47,7 @@ function Landing() {
 
             </div>
             <Whatweoffer />
-
+            <FAQSection />
         </>
 
 
