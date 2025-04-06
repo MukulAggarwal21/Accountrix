@@ -45,9 +45,10 @@ export default function LoginRegister() {
                 throw new Error(data.message || 'Something went wrong')
             }
             
+
             // Handle successful response
             console.log('Success:', data)
-            window.location.href = '/' // Redirect to homepage
+            window.location.href = '/jobsearch' // Redirect to homepage
             
         } catch (err) {
             setError(err.message)
