@@ -6,7 +6,7 @@ import Whatweoffer from '../offering/whatweoffer'
 import FAQSection from '../FAQ/faqQuestion'
 import Footer from '../Footer/footer'
 import BrandHiring from '../BrandHiring/BrandHiring'
-import { useState } from 'react'
+// import { useState } from 'react'
 
 function Landing() {
 //   const [isAuthenticated, setIsAuthenticated] = useState(false); // Change this to true if the user is logged in

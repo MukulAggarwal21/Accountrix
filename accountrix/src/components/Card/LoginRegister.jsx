@@ -48,7 +48,7 @@ export default function LoginRegister() {
 
             // Handle successful response
             console.log('Success:', data)
-            window.location.href = '/jobsearch' // Redirect to homepage
+            window.location.href = '/brandhiring' // Redirect to homepage
             
         } catch (err) {
             setError(err.message)

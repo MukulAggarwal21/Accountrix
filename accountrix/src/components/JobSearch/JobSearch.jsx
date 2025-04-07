@@ -163,7 +163,8 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
-
+import JobCard from '../Card/JobCard';
+// import { J } from 'framer-motion/dist/types.d-B50aGbjN';
 const JobSearch = () => {
   // Refs for detecting clicks outside dropdowns
   const expDropdownRef = useRef(null);
@@ -202,20 +203,19 @@ const JobSearch = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
+      <div className="absolute   top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full filter blur-3xl opacity-30"></div>
       
-      <div className="container mx-auto px-6 py-16 max-w-6xl relative z-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+      <div className="container mx-auto px-6 pl-10 py-4  relative z-10">
+        <div className="flex flex-col md:flex-row   items-center justify-between gap-12">
           {/* Left content section */}
           <div className="md:w-1/2 pt-8 text-center md:text-left">
             <div className="inline-block text-green-600 font-semibold px-5 py-2 mb-8 bg-green-50 rounded-full shadow-sm border border-green-100 transform hover:scale-105 transition-transform duration-300">
-              INDIA'S #1 JOB PLATFORM
+              CA'S #1 JOB PLATFORM
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-purple-950 mb-8 leading-tight">
-              Your job search 
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-purple-500 block mt-2">ends here</span>
+            <h1 className="text-5xl  md:text-6xl font-bold text-purple-950 mb-8 leading-tight">
+              Your job search <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-purple-500 block mt-2">ends here</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-800 mb-12">
@@ -223,7 +223,7 @@ const JobSearch = () => {
             </p>
             
             {/* Search form with improved styling */}
-            <div className="bg-white rounded-2xl shadow-xl p-4 flex flex-col md:flex-row items-stretch mb-12 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
+            <div className=" rounded-2xl shadow-xl p-4 flex flex-col md:flex-row items-stretch mb-12 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
               {/* Job search input */}
               <div className="flex items-center border-b md:border-b-0 md:border-r border-gray-200 px-4 py-3 flex-1 group">
                 <svg className="w-5 h-5 text-green-600 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -371,79 +371,19 @@ const JobSearch = () => {
               </div>
             </div>
             
-            {/* Proud to Support section */}
-            <div className="mt-8">
-              <p className="text-lg font-bold text-gray-800 mb-8 relative inline-block after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-1 after:bg-green-200 after:rounded-full">
-                Proud to Support
-              </p>
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-10">
-                {/* Ministry logo */}
-                <div className="grayscale hover:grayscale-0 transition-all duration-500 transform hover:scale-110 bg-white p-3 rounded-lg shadow-sm">
-                  <img src="/api/placeholder/120/40" alt="Ministry of Labour & Employment" className="h-12 object-contain" />
-                </div>
-                
-                {/* Certification logo */}
-                <div className="grayscale hover:grayscale-0 transition-all duration-500 transform hover:scale-110 bg-white p-3 rounded-lg shadow-sm">
-                  <img src="/api/placeholder/60/60" alt="Certification" className="h-14 object-contain" />
-                </div>
-                
-                {/* DPIIT Startup India logo */}
-                <div className="grayscale hover:grayscale-0 transition-all duration-500 transform hover:scale-110 bg-white p-3 rounded-lg shadow-sm">
-                  <img src="/api/placeholder/120/40" alt="DPIIT Startup India" className="h-12 object-contain" />
-                </div>
-              </div>
-            </div>
+          
           </div>
           
-          {/* Right image section - Enhanced with shadow and animation */}
-          <div className="md:w-1/2 flex justify-center md:justify-end mt-8 md:mt-0">
-            <div className="relative">
-              {/* Glowing effect behind image */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-green-400 to-purple-500 rounded-3xl blur-xl opacity-30 animate-pulse"></div>
-              
-              {/* Main image with hover effects */}
-              <div className="relative transform transition-all duration-700 hover:translate-y-2 group">
-                <img 
-                  src="/api/placeholder/500/600" 
-                  alt="Person holding phone" 
-                  className="object-contain rounded-3xl shadow-2xl relative z-10 border-2 border-white"
-                />
-                
-                {/* App logo circle */}
-                <div className="absolute -bottom-4 -right-4 w-28 h-28 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300 z-20">
-                  <div className="bg-white w-24 h-24 rounded-full flex items-center justify-center">
-                    <span className="text-green-600 font-bold text-2xl">apna</span>
-                  </div>
-                </div>
-                
-                {/* Floating elements */}
-                <div className="absolute top-1/4 -left-6 bg-white p-2 rounded-lg shadow-lg z-20 transform -rotate-6 group-hover:-rotate-12 transition-transform duration-300">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                    <span className="text-xs font-medium">50L+ Jobs</span>
-                  </div>
-                </div>
-                
-                <div className="absolute top-1/2 -right-8 bg-white p-2 rounded-lg shadow-lg z-20 transform rotate-6 group-hover:rotate-12 transition-transform duration-300">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
-                    <span className="text-xs font-medium">All Industries</span>
-                  </div>
-                </div>
-                
-                <div className="absolute bottom-1/4 -left-8 bg-white p-2 rounded-lg shadow-lg z-20 transform rotate-6 group-hover:rotate-12 transition-transform duration-300">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs font-medium">Verified Jobs</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+
+
+          
         </div>
       </div>
+
+      <JobCard/>
     </div>
   );
 };
 
 export default JobSearch;
+
