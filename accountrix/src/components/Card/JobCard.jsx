@@ -3,9 +3,10 @@ import React from "react";
 import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
 import JobSearchInfoPage from "../JobSearch/JobSearchInfoPage";
-
+import CompanyInfoPage from "../JobSearch/CompanyInfoPage";
 const JobCard = () => {
   const [showDetails, setShowDetails] = useState(false);
+  const [detailType, setDetailType] = useState(null);
 
   // const navigate = useNavigate();
 
@@ -44,7 +45,16 @@ const JobCard = () => {
         </div>
 
         {/* Arrow */}
-        <div className="text-gray-400 hover:text-gray-600 mt-2">
+
+        <div
+
+          onClick={() => {
+            setDetailType("company");
+
+            setShowDetails(true)
+          }}
+
+          className="text-gray-400 hover:text-gray-600 mt-2">
           <ExternalLink size={18} />
         </div>
       </div>
@@ -77,7 +87,11 @@ const JobCard = () => {
 
           <button
 
-            onClick={() => setShowDetails(true)}
+            onClick={() => {
+              setDetailType("job");
+
+              setShowDetails(true)
+            }}
 
 
             className="bg-black text-white px-4 py-1 my-1 rounded text-sm hover:opacity-90"
@@ -99,14 +113,14 @@ const JobCard = () => {
           <span>Hide</span>
         </button>
       </div>
-      
+
       {showDetails && (
-        
+
         <div className="fixed inset-0 z-50    bg-white/30 flex items-end justify-center h-full">
-        
+
           <div className="w-full  h-[80vh] overflow-y-auto   rounded-4xl shadow-lg animate-slideUp relative">
             {/* Close Button */}
-            
+
             <button
               className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
               onClick={() => setShowDetails(false)}
@@ -114,8 +128,8 @@ const JobCard = () => {
               ✕
             </button>
 
-            {/* Job Info Component */}
-            <JobSearchInfoPage />
+            
+            {detailType === "job" ? <JobSearchInfoPage /> : <CompanyInfoPage />}
           </div>
         </div>
       )}
@@ -125,42 +139,3 @@ const JobCard = () => {
 };
 
 export default JobCard;
-// import React, { useState } from "react";
-// import JobSearchInfoPage from "../JobSearch/JobSearchInfoPage";
-
-// const JobCard = () => {
-//   const [showDetails, setShowDetails] = useState(false);
-
-//   return (
-//     <>
-//       {/* Job Card Preview */}
-//       <div
-//         className="cursor-pointer bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-all"
-//         onClick={() => setShowDetails(true)}
-//       >
-//         <h2 className="text-xl font-semibold">Frontend Developer</h2>
-//         <p className="text-sm text-gray-600">Remote | Full-time</p>
-//       </div>
-
-//       {/* Slide-up Job Details with blurred background */}
-//       {showDetails && (
-//         <div className="fixed inset-0 z-50 backdrop-blur-lg bg-white/30 flex items-end justify-center">
-//           <div className="w-full max-w-6xl h-[90vh] overflow-y-auto bg-white rounded-t-xl shadow-lg animate-slideUp relative">
-//             {/* Close Button */}
-//             <button
-//               className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
-//               onClick={() => setShowDetails(false)}
-//             >
-//               ✕
-//             </button>
-
-//             {/* Job Info Component */}
-//             <JobSearchInfoPage />
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default JobCard;
