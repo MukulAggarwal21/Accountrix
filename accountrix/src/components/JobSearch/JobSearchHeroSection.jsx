@@ -1,15 +1,15 @@
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import JobCard from '../Card/JobCard';
 import JobSearchResult from './JobSearchResult';
+import JobseachAnimation from '../../assets/Animations/jobsearch.json';
+import Lottie from 'react-lottie';
+
 const JobSearch = () => {
   // Refs for detecting clicks outside dropdowns
   const expDropdownRef = useRef(null);
   const locDropdownRef = useRef(null);
   const jobSearchResultRef = useRef(null); // Ref for JobSearchResult section
 
-  
   // Dropdown state management
   const [showExpDropdown, setShowExpDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -40,37 +40,37 @@ const JobSearch = () => {
     };
   }, []);
 
-   const handleSearchJobs = () => {
+  const handleSearchJobs = () => {
     if (jobSearchResultRef.current) {
       jobSearchResultRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute   top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
+      <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full filter blur-3xl opacity-30"></div>
 
-      <div className="container mx-auto px-6 pl-10 py-4  relative z-10">
-        <div className="flex flex-col md:flex-row   items-center justify-between gap-12">
-          {/* Left content section */}
-          <div className="md:w-1/2 pt-8 text-center md:text-left">
-            <div className="inline-block text-green-600 font-semibold px-5 py-2 mb-8 bg-green-50 rounded-full shadow-sm border border-green-100 transform hover:scale-105 transition-transform duration-300">
+      {/* Main content container with rightward shift */}
+      <div className="container mx-auto pl-16 md:pl-24 lg:pl-32 pr-4 py-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Left content section with rightward shift */}
+          <div className="md:w-1/2 pt-4 text-center md:text-left pr-4">
+            <div className="inline-block text-green-600 font-semibold px-5 py-2 mb-6 bg-green-50 rounded-full shadow-sm border border-green-100 transform hover:scale-105 transition-transform duration-300">
               CA'S #1 JOB PLATFORM
             </div>
 
-            <h1 className="text-5xl  md:text-6xl font-bold text-purple-950 mb-8 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-purple-950 mb-6 leading-tight">
               Your job search <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-purple-500 block mt-2">ends here</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-gray-800 mb-12">
+            <p className="text-lg md:text-2xl text-gray-800 mb-8">
               Discover <span className="font-semibold bg-yellow-100 px-2 py-1 rounded-md">50 lakh+</span> career opportunities
             </p>
 
             {/* Search form with improved styling */}
-            <div className=" rounded-2xl shadow-xl p-4 flex flex-col md:flex-row items-stretch mb-12 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
+            <div className="rounded-2xl shadow-xl p-4 flex flex-col md:flex-row items-stretch mb-8 border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
               {/* Job search input */}
               <div className="flex items-center border-b md:border-b-0 md:border-r border-gray-200 px-4 py-3 flex-1 group">
                 <svg className="w-5 h-5 text-green-600 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -195,7 +195,7 @@ const JobSearch = () => {
 
               {/* Search button */}
               <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg mt-3 md:mt-0 transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center justify-center space-x-2"
-              onClick={handleSearchJobs}
+                onClick={handleSearchJobs}
               >
                 <span>Search jobs</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -205,7 +205,7 @@ const JobSearch = () => {
             </div>
 
             {/* Quick categories */}
-            <div className="flex flex-wrap gap-3 mb-16 justify-center md:justify-start">
+            <div className="flex flex-wrap gap-3 mb-10 justify-center md:justify-start">
               <div className="px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-600 cursor-pointer transition-colors">
                 Popular Jobs
               </div>
@@ -219,25 +219,33 @@ const JobSearch = () => {
                 Freshers
               </div>
             </div>
-
-
           </div>
 
-
-
-
+          {/* Right animation section - shifted more to the right */}
+          <div className="md:w-1/2 flex items-center justify-end pr-8 md:pr-12 lg:pr-16">
+            <div className="w-full max-w-lg">
+              <Lottie
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: JobseachAnimation,
+                  rendererSettings: {
+                    preserveAspectRatio: 'xMidYMid slice',
+                  },
+                }}
+                height={420}
+                width={420}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       <div ref={jobSearchResultRef}>
         <JobSearchResult />
-
       </div>
-
-
     </div>
   );
 };
 
 export default JobSearch;
-
