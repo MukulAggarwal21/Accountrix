@@ -13,7 +13,7 @@ function Landing() {
 
 
     return (
-        <> 
+        <>
             <div className={`min-h-screen bg- bg-black  relative overflow-hidden flex flex-col items-center
             `}>
                 {/* Background gradient overlay */}
@@ -24,7 +24,10 @@ function Landing() {
                     }`}> </div>
 
                 {/* Navbar */}
-                <Navbar/>
+                <div>
+                    {/* <Navbar /> */}
+
+                </div>
 
 
                 {/* Main Content */}

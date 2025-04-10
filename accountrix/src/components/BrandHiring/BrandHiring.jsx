@@ -7,6 +7,7 @@ export default function BrandHiring() {
   const navigate = useNavigate();
   return (
     <>
+      <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" />
       <div className="bg-white w-full font-sans">
         <div
           className="relative w-full h-[610px] bg-cover bg-center bg-no-repeat border-blue-900 flex items-center"

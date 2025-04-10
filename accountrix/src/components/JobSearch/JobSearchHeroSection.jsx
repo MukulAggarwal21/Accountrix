@@ -3,7 +3,7 @@ import JobCard from '../Card/JobCard';
 import JobSearchResult from './JobSearchResult';
 import JobseachAnimation from '../../assets/Animations/jobsearch.json';
 import Lottie from 'react-lottie';
-
+import Navbar from '../Navbar';
 const JobSearch = () => {
   // Refs for detecting clicks outside dropdowns
   const expDropdownRef = useRef(null);
@@ -47,13 +47,14 @@ const JobSearch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white overflow-hidden ">
+    <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-400"/>
       {/* Background decorative elements */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
+      <div className="absolute  top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full filter blur-3xl opacity-30"></div>
 
       {/* Main content container with rightward shift */}
-      <div className="container mx-auto pl-16 md:pl-24 lg:pl-32 pr-4 py-8 relative z-10">
+      <div className="container mx-auto pl-16 md:pl-24 lg:pl-32 pr-4 py-8  pt-10 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Left content section with rightward shift */}
           <div className="md:w-1/2 pt-4 text-center md:text-left pr-4">

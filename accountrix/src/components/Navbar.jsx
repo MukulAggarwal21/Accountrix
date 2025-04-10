@@ -10,11 +10,11 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "../components/ui/navigation-menu"
-export default function Navbar() {
+export default function Navbar({ backgroundColor }) {
 
     
     return (
-        <nav className="relative z-10 py-4 w-full  bg-black flex justify-between items-center px-6">
+        <nav className={`relative z-10 py-4 w-full   flex justify-between items-center px-6 ${backgroundColor}`}>
         
             <img src={accountrixLogo} alt="Accountrix" className="h-14" />
             <div className="hidden md:flex gap-6">
