@@ -1,7 +1,7 @@
 import React from 'react'
 import LoginRegister from '../Card/LoginRegister'
 
-export default function LandingMain() {
+export default function LandingMain({ setIsAuthenticated }) {
   return (
     // <div className="min-h-screen relative bg-black overflow-hidden flex flex-col items-center">
     //   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,200,0.3)_0%,rgba(0,0,0,0.9)_70%)] pointer-events-none z-0"></div>
@@ -58,7 +58,7 @@ export default function LandingMain() {
       </div>
 
       {/* Login/register Card - Right Side */}
-      <LoginRegister />
+      <LoginRegister setIsAuthenticated={setIsAuthenticated}  />
 
     </main>
   )
