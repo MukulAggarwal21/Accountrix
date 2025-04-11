@@ -59,16 +59,17 @@ import LandingMain from './LandingMain';
 import Whatweoffer from '../offering/whatweoffer';
 import FAQSection from '../FAQ/faqQuestion';
 import Footer from '../Footer/footer';
-import BrandHiring from '../BrandHiring/BrandHiring';
+import BrandHiring from '../Student/BrandHiring/BrandHiring';
 import HeroSection from '../HeroSection/HeroSection';
 import Testimonials from '../Testimonials/Testimonials';
 import Features from '../Features/Features';
 import Statistics from '../Statistics/Statistics';
 import Newsletter from '../Subscription/Subscription';
 import Partners from '../Partners/Partners';
-
+import ProfileSetup from '../Recruiter/ProfileSetup';
 function Landing() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userType, setUserType] = useState(null); // 'student' or 'recruiter'
 
     return (
         <>
@@ -91,12 +92,21 @@ function Landing() {
 
                 {/* Main Content */}
 
-                {isAuthenticated ? (
+                {/* {isAuthenticated ? (
                     <BrandHiring className="bg-red-900" />
                 ) : (
                     <LandingMain setIsAuthenticated={setIsAuthenticated} />
-                )}
+                )} */}
 
+                {isAuthenticated ? (
+                    userType === 'student' ? (
+                        <BrandHiring />
+                    ) : (
+                        <ProfileSetup />
+                    )
+                ) : (
+                    <LandingMain setIsAuthenticated={setIsAuthenticated} setUserType={setUserType} />
+                )}
 
             </div>
             <HeroSection />
@@ -105,7 +115,7 @@ function Landing() {
             <Whatweoffer />
             <Testimonials />
             <Partners />
-                        <Statistics />
+            <Statistics />
 
             <Newsletter />
             <FAQSection />

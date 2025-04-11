@@ -1,5 +1,5 @@
 import React from 'react'
-import JobCard from '../Card/JobCard'
+import JobCard from '../../Card/JobCard'
 export default function JobSearchResult() {
     return (
         <>

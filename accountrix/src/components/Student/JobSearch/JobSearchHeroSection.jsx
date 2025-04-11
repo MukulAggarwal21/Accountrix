@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import JobCard from '../Card/JobCard';
+import JobCard from '../../Card/JobCard';
 import JobSearchResult from './JobSearchResult';
-import JobseachAnimation from '../../assets/Animations/jobsearch.json';
+import JobseachAnimation from '../../../assets/Animations/jobsearch.json';
 import Lottie from 'react-lottie';
-import Navbar from '../Navbar';
+import Navbar from '../../Navbar';
 const JobSearch = () => {
   // Refs for detecting clicks outside dropdowns
   const expDropdownRef = useRef(null);

@@ -1,7 +1,7 @@
 import React from 'react'
 import LoginRegister from '../Card/LoginRegister'
 import Navbar from '../Navbar'
-export default function LandingMain({ setIsAuthenticated }) {
+export default function LandingMain({ setIsAuthenticated , setUserType}) {
   return (
 
     <>
@@ -29,7 +29,7 @@ export default function LandingMain({ setIsAuthenticated }) {
       </div>
 
       {/* Login/register Card - Right Side */}
-      <LoginRegister setIsAuthenticated={setIsAuthenticated}  />
+      <LoginRegister setIsAuthenticated={setIsAuthenticated} setUserType={setUserType} />
 
     </main>
     </>

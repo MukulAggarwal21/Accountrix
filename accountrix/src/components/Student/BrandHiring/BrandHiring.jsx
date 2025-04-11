@@ -1,8 +1,8 @@
 
 import React from "react";
-import brandHiringImage from '../../assets/images/brandhiring.png';
+import brandHiringImage from '../../../assets/images/brandhiring.png';
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
+import Navbar from "../../Navbar";
 export default function BrandHiring() {
   const navigate = useNavigate();
   return (

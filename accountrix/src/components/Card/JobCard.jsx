@@ -2,8 +2,8 @@
 import React from "react";
 import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
-import JobSearchInfoPage from "../JobSearch/JobSearchInfoPage";
-import CompanyInfoPage from "../JobSearch/CompanyInfoPage";
+import JobSearchInfoPage from "../Student/JobSearch/JobSearchInfoPage";
+import CompanyInfoPage from "../Student/JobSearch/CompanyInfoPage";
 import {
   Dialog,
   DialogContent,
