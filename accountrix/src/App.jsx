@@ -14,6 +14,7 @@ import Candidates from './components/Recruiter/Dashboard/Candidates';
 import Analytics from './components/Recruiter/Dashboard/Analytics';
 import Testing from './components/Recruiter/Dashboard/testing';
 import JobPosting from './components/Recruiter/Dashboard/JobPosting';
+import Info from './components/Recruiter/SignupInfo/Info';
 function App() {
 
   return (
@@ -33,6 +34,7 @@ function App() {
         </Route>
         <Route path="/testing" element={<Testing />} />
         <Route path="/jobposting" element={<JobPosting />} />
+        <Route path="/info" element={<Info/>} />
       </Routes>
 
     </Router>
