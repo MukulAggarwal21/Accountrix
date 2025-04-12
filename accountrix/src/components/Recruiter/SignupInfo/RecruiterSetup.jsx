@@ -117,9 +117,9 @@ const RecruiterSetup = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-            JobConnect
+            Accountrix
           </h1>
-          <p className="mt-3 text-xl text-gray-600">Where talent meets opportunity</p>
+          <p className="mt-3 text-xl text-gray-600">One portal. Endless career possibilities.</p>
         </div>
 
 
@@ -129,7 +129,7 @@ const RecruiterSetup = () => {
 
         {/* Form Card Container */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-5xl mx-auto mb-16 transform transition duration-300 hover:shadow-2xl">
-         
+
           {/* Page 1: Company & Personal Info */}
           {currentStep === 1 && (
             <motion.div
@@ -141,7 +141,7 @@ const RecruiterSetup = () => {
               <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Create Your Recruiter Account</h2>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
-               
+
                 {/* Company Information */}
                 <CompanyInfoForm formData={formData} handleInputChange={handleInputChange} handleFileUpload={handleFileUpload} />
 
@@ -206,7 +206,7 @@ const RecruiterSetup = () => {
             </motion.div>
           )}
 
-      
+
           {/* Page 3: Completion */}
           {currentStep === 3 && (
             <motion.div
