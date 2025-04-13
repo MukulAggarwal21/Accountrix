@@ -6,7 +6,7 @@ import JobSearchInfoPage from './components/Student/JobSearch/JobSearchInfoPage'
 import BrandHiring from './components/Student/BrandHiring/BrandHiring';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Dashboard from './components/Recruiter/Dashboard/Dashboard';
+import Dashboard from './components/Recruiter/Dashboard/Landing';
 import ViewJobs from './components/Recruiter/Dashboard/ViewJobs';
 import PostJob from './components/Recruiter/Dashboard/PostJob';
 import Candidates from './components/Recruiter/Dashboard/Candidates';
@@ -14,6 +14,7 @@ import Analytics from './components/Recruiter/Dashboard/Analytics';
 import Testing from './components/Recruiter/Dashboard/testing';
 import JobPosting from './components/Recruiter/Dashboard/JobPosting';
 import RecruiterSetup from './components/Recruiter/SignupInfo/RecruiterSetup';
+import JobList from './components/Recruiter/Dashboard/JobList';
 function App() {
 
   return (
@@ -32,7 +33,9 @@ function App() {
         </Route>
         <Route path="/testing" element={<Testing />} />
         <Route path="/jobposting" element={<JobPosting />} />
-        <Route path="/recruitersetup" element={<RecruiterSetup/>} />
+        <Route path="/recruitersetup" element={<RecruiterSetup />} />
+        <Route path="/joblist" element={<JobList />} />
+
       </Routes>
 
     </Router>
