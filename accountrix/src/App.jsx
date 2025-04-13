@@ -15,6 +15,7 @@ import Testing from './components/Recruiter/Dashboard/testing';
 import JobPosting from './components/Recruiter/Dashboard/JobPosting';
 import RecruiterSetup from './components/Recruiter/SignupInfo/RecruiterSetup';
 import JobList from './components/Recruiter/Dashboard/JobList';
+import ComingSoon from './components/Recruiter/Dashboard/ComingSoon';
 function App() {
 
   return (
@@ -35,7 +36,7 @@ function App() {
         <Route path="/jobposting" element={<JobPosting />} />
         <Route path="/recruitersetup" element={<RecruiterSetup />} />
         <Route path="/joblist" element={<JobList />} />
-
+        <Route path="/soon" element={<ComingSoon />} />
       </Routes>
 
     </Router>

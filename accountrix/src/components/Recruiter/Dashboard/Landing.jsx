@@ -9,6 +9,7 @@ import {
   Settings,
   X,
   User,
+  Star,
 
 } from 'lucide-react';
 
@@ -16,6 +17,8 @@ import {
 import MainDashboard from './MainDashboard';
 import Navigation from './Navigation';
 import ViewJobs from './ViewJobs';
+import JobList from './JobList';
+import ComingSoon from './ComingSoon';
 
 
 
@@ -68,7 +71,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="flex-1 space-y-1 px-2 py-4">
+        {/* <div className="flex-1 space-y-1 px-2 py-4">
           <div onClick={() => setStep(1)} className="flex items-center rounded-lg bg-indigo-800 px-4 py-3 text-white">
             <BriefcaseBusiness className="mr-3" size={20} />
             <span className="text-sm font-medium">Dashboard</span>
@@ -93,20 +96,82 @@ export default function Dashboard() {
             <BarChart3 className="mr-3" size={20} />
             <span className="text-sm font-medium">Jobs</span>
           </div>
+          <div onClick={() => setStep(6)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
+            <Star className="mr-3" size={20} />
+            <span className="text-sm font-medium">  Blogs</span>
+          </div>
 
-          {/* <div
-            className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800 cursor-pointer"
-            onClick={() => navigate('/joblist')}
+          <div onClick={() => setStep(7)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
+            <Users className="mr-3" size={20} />
+            <span className="text-sm font-medium">Profile</span>
+          </div>
+        </div> */}
+
+        <div className="flex-1 space-y-1 px-2 py-4">
+          <div
+            onClick={() => setStep(1)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 1 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <BriefcaseBusiness className="mr-3" size={20} />
+            <span>Dashboard</span>
+          </div>
+
+          <div
+            onClick={() => setStep(2)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 2 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <Users className="mr-3" size={20} />
+            <span>Candidates</span>
+          </div>
+
+          <div
+            onClick={() => setStep(3)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 3 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <Calendar className="mr-3" size={20} />
+            <span>Interviews</span>
+          </div>
+
+          <div
+            onClick={() => setStep(4)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 4 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <MessageSquare className="mr-3" size={20} />
+            <span>Messages</span>
+          </div>
+
+          <div
+            onClick={() => setStep(5)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 5 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
           >
             <BarChart3 className="mr-3" size={20} />
-            <span className="text-sm font-medium">Jobs</span>
-          </div> */}
+            <span>Jobs</span>
+          </div>
 
-          <div onClick={() => setStep(6)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <Settings className="mr-3" size={20} />
-            <span className="text-sm font-medium">Settings</span>
+          <div
+            onClick={() => setStep(6)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 6 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <Star className="mr-3" size={20} />
+            <span>Blogs</span>
+          </div>
+
+          <div
+            onClick={() => setStep(7)}
+            className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium cursor-pointer ${step === 7 ? 'bg-indigo-800 text-white' : 'text-indigo-100 hover:bg-indigo-800'
+              }`}
+          >
+            <Users className="mr-3" size={20} />
+            <span>Profile</span>
           </div>
         </div>
+
 
         <div className="flex items-center border-t border-indigo-800 p-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white">
@@ -127,11 +192,16 @@ export default function Dashboard() {
 
 
         {/* Main Dashboard */}
-        {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} />}
-        
-        {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
+        {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
 
-        {step == 5 && <ViewJobs />}
+        {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
+        {step == 2 && <ComingSoon/>}
+        {step == 3 && <ComingSoon />}
+        {step == 4 && <ComingSoon />}
+
+        {step == 5 && <JobList />}
+        {step == 6 && <ComingSoon />}
+        {step == 7 && <ComingSoon />}
 
       </div>
     </div>
