@@ -19,6 +19,7 @@ import Navigation from './Navigation';
 import ViewJobs from './ViewJobs';
 import JobList from './JobList';
 import ComingSoon from './ComingSoon';
+import InterviewSchedule from './InterviewSchedule';
 
 
 
@@ -196,7 +197,7 @@ export default function Dashboard() {
 
         {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
         {step == 2 && <ComingSoon/>}
-        {step == 3 && <ComingSoon />}
+        {step == 3 && <InterviewSchedule/>}
         {step == 4 && <ComingSoon />}
 
         {step == 5 && <JobList />}

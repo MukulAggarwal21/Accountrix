@@ -16,6 +16,7 @@ import JobPosting from './components/Recruiter/Dashboard/JobPosting';
 import RecruiterSetup from './components/Recruiter/SignupInfo/RecruiterSetup';
 import JobList from './components/Recruiter/Dashboard/JobList';
 import ComingSoon from './components/Recruiter/Dashboard/ComingSoon';
+import InterviewSchedule from './components/Recruiter/Dashboard/InterviewSchedule';
 function App() {
 
   return (
