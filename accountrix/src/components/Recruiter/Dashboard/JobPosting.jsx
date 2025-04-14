@@ -19,7 +19,7 @@ import {
   Minus
 } from 'lucide-react';
 
-export default function JobPosting() {
+export default function JobPosting( { step , setStep}) {
   const [currentStep, setCurrentStep] = useState(1);
   const [jobType, setJobType] = useState('full-time');
   const [remotePolicy, setRemotePolicy] = useState('');
@@ -316,18 +316,18 @@ const renderStep5 = () => {
           Please review all the details you have entered before submitting the
           job posting.
         </p>
-        <button
+        {/* <button
           
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
           Submit Job Posting
-        </button>
+        </button> */}
       </div>
     </div>
   );
 };
  return (
-  <div className="max-w-4xl mx-auto px-4 py-8">
+  <div className="  px-8 py-8">
     {renderProgressBar()}
     {currentStep === 1 && renderStep1()}
     {currentStep === 2 && renderStep2()}
@@ -343,13 +343,40 @@ const renderStep5 = () => {
       >
         <ChevronLeft className="inline-block w-4 h-4 mr-1" /> Previous
       </button>
-      <button
-        onClick={handleNextStep}
+      {/* <button
+        onClick={currentStep===5 ? ()=>{
+         setStep(1);
+         console.log("button clickedddd")
+        } : handleNextStep}
         disabled={currentStep === totalSteps}
-        className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        className={`px-4 py-2 text-white rounded ${
+        currentStep == 5 ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700 "}`}
       >
-        Next
-      </button>
+       {currentStep === 5 ? "Submit Job Posting" :"Next"}
+      </button> */}
+     
+      <button
+  onClick={
+    currentStep === 5
+      ? () => {
+          if (!setStep) {
+            console.error("setStep is not defined");
+            return;
+          }
+          setStep(1);
+          console.log("button clickedddd");
+        }
+      : handleNextStep
+  }
+  disabled={currentStep === totalSteps}
+  className={`px-4 py-2 text-white rounded ${
+    currentStep === 5
+      ? "bg-green-600 hover:bg-green-700"
+      : "bg-indigo-600 hover:bg-indigo-700"
+  }`}
+>
+  {currentStep === 5 ? "Submit Job Posting" : "Next"}
+</button>
     </div>
   </div>
 );

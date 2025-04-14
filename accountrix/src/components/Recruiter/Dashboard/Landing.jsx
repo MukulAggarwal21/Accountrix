@@ -19,7 +19,8 @@ import Navigation from './Navigation';
 import ViewJobs from './ViewJobs';
 import JobList from './JobList';
 import ComingSoon from './ComingSoon';
-import InterviewSchedule from './InterviewSchedule';
+import InterviewSchedule from './Interview/InterviewSchedule';
+import JobPosting from './JobPosting';
 
 
 
@@ -204,6 +205,8 @@ export default function Dashboard() {
         {step == 6 && <ComingSoon />}
         {step == 7 && <ComingSoon />}
 
+
+        {step == 8 && <JobPosting setStep={setStep} step={step}/>}
       </div>
     </div>
   );

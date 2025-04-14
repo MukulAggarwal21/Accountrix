@@ -1,5 +1,4 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
     Calendar,
     Filter,
@@ -7,14 +6,13 @@ import {
     Star
 } from 'lucide-react';
 export default function MainDashboard({ stats, recentApplications, upcomingInterviews ,setStep }) {
-    const navigate = useNavigate()
     return (
         <>
             <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-gray-800">Recruiter Dashboard</h2>
                     <button onClick={() => {
-                        navigate('/jobposting')
+                        setStep(8)
                     }} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
                         + Post New Job
                     </button>
