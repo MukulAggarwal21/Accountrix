@@ -25,7 +25,7 @@ import React from 'react';
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gradient-to-r from-blue-800 to-green-900 text-white py-20">
+    <section className="relative  border-white border-2 bg-white text-blue-800 py-20">
       <div className="container mx-auto px-6 text-center">
         <h1 className="text-5xl font-bold mb-6">
           Welcome to <span className="text-yellow-400">Accountrix</span>

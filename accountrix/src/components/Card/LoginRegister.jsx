@@ -3,8 +3,9 @@
 import React from 'react'
 import { useState } from 'react'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-
+import { useNavigate } from 'react-router-dom'
 export default function LoginRegister({ setIsAuthenticated }) {
+    const navigate = useNavigate()
     const [showPassword, setShowPassword] = useState(false)
     const [activeTab, setActiveTab] = useState('login') // 'login' or 'register'
     const [formData, setFormData] = useState({
@@ -51,6 +52,22 @@ export default function LoginRegister({ setIsAuthenticated }) {
             // window.location.href = '/brandhiring' // Redirect to homepage
             setIsAuthenticated(true); // Update authentication state
 
+
+            if (activeTab === 'login') {
+                if (formData.role === 'recruiter') {
+                    navigate('/dashboard');
+                } else if (formData.role === 'student') {
+                    navigate('/brandhiring');
+                }
+            }
+            else if (activeTab === 'register') {
+                if (formData.role === 'recruiter') {
+                    navigate('/recruitersetup');
+                }
+                else if (formData.role === 'student') {
+                    navigate('/brandhiring');
+                }
+            }
 
         } catch (err) {
             setError(err.message)

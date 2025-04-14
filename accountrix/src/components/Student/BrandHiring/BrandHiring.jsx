@@ -8,9 +8,9 @@ export default function BrandHiring() {
   return (
     <>
       <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" />
-      <div className="bg-white w-full font-sans">
+      <div className="bg-white w-full h-full font-sans">
         <div
-          className="relative w-full h-[610px] bg-cover bg-center bg-no-repeat border-blue-900 flex items-center"
+          className="relative w-full lg:h-[650px] h-[570px] bg-cover bg-center bg-no-repeat border-blue-900 flex items-center"
           style={{ backgroundImage: `url(${brandHiringImage})` }}
         // style={{ backgroundImage: "url('https://tse1.mm.bing.net/th?id=OIP.fQQ-mRqXRZ_mxYbbXDiRmQHaEK&pid=Api&P=0&h=180')" } }
         >

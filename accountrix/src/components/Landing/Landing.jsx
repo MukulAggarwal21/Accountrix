@@ -114,7 +114,7 @@ function Landing() {
             <Features />
             <Whatweoffer />
             <Testimonials />
-            <Partners />
+            {/* <Partners /> */}
             <Statistics />
 
             <Newsletter />
