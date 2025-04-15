@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Search, Filter, User, Briefcase, Star, Calendar, ChevronDown, MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import SearchBarFilter from './SearchBarFilter';
+import Pagination from './Pagination';
 
 export default function AllApplication() {
   const [applications, setApplications] = useState([
@@ -181,46 +183,14 @@ export default function AllApplication() {
       </header>
 
       {/* Main Content - With proper height management */}
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col">
-        {/* Search & Filter Bar - Sticky below header */}
-        <div className="bg-white p-4 rounded-lg shadow mb-4  top-16 z-10">
-          <div className="flex flex-col lg:flex-row justify-between gap-4">
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search size={20} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search candidates by name, position, or company..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-              {filters.map(filter => (
-                <button
-                  key={filter}
-                  className={`px-4 py-2 rounded-md whitespace-nowrap ${
-                    activeFilter === filter 
-                      ? 'bg-indigo-100 text-indigo-700 font-medium border border-indigo-200' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  onClick={() => setActiveFilter(filter)}
-                >
-                  {filter}
-                </button>
-              ))}
-              <button className="px-4 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-1">
-                <Filter size={16} />
-                <span>More Filters</span>
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Search Bar and Filter */}
+        <SearchBarFilter filters={filters} setActiveFilter={ setActiveFilter} activeFilter={activeFilter} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
 
         {/* Applications List - Scrollable container with fixed height */}
-        <div className=" bg-red-600  max-h-[calc(100vh-340px)]  rounded-lg shadow flex-1 flex flex-col overflow-y-auto">
+        <div className=" bg-red-600  max-h-[calc(100vh-345px)]  rounded-lg shadow flex-1 flex flex-col overflow-y-auto">
           {/* Table Header - Sticky within scrollable area */}
           <div className="border-b border-gray-200 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center sticky top-0 z-10">
             <div className="w-8"></div>
@@ -377,25 +347,8 @@ export default function AllApplication() {
         </div>
 
         {/* Pagination - Fixed at bottom */}
-        <div className="mt-4 py-3 px-4 bg-white rounded-lg shadow flex items-center justify-between">
-          <div className="text-sm text-gray-700">
-            Showing <span className="font-medium">{filteredApplications.length}</span> of <span className="font-medium">{applications.length}</span> candidates
-          </div>
-          <div className="flex space-x-2">
-            <button className="bg-white border border-gray-300 text-gray-500 px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-50">
-              Previous
-            </button>
-            <button className="bg-indigo-50 border border-indigo-500 text-indigo-600 px-4 py-2 text-sm font-medium rounded-md">
-              1
-            </button>
-            <button className="bg-white border border-gray-300 text-gray-500 px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-50">
-              2
-            </button>
-            <button className="bg-white border border-gray-300 text-gray-500 px-4 py-2 text-sm font-medium rounded-md hover:bg-gray-50">
-              Next
-            </button>
-          </div>
-        </div>
+      <Pagination filteredApplications={filteredApplications} applications={applications} />
+
       </main>
 
       <style jsx>{`
