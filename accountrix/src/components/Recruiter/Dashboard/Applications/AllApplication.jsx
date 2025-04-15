@@ -190,9 +190,9 @@ export default function AllApplication() {
 
 
         {/* Applications List - Scrollable container with fixed height */}
-        <div className=" bg-red-600  max-h-[calc(100vh-345px)]  rounded-lg shadow flex-1 flex flex-col overflow-y-auto">
+        <div className="  max-h-[calc(100vh-345px)]  rounded-lg shadow flex-1 flex flex-col overflow-y-auto">
           {/* Table Header - Sticky within scrollable area */}
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center sticky top-0 z-10">
+          <div className="border-b  border-gray-200 bg-gray-50 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center sticky top-0 z-10">
             <div className="w-8"></div>
             <div className="w-1/4 flex items-center gap-1">
               <span>Candidate</span>
@@ -219,7 +219,7 @@ export default function AllApplication() {
 
           {/* Scrollable content area */}
           <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 265px)" }}>
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y  divide-gray-200 ">
               {filteredApplications.length > 0 ? (
                 filteredApplications.map(candidate => (
                   <div key={candidate.id} className="bg-white">
@@ -267,7 +267,7 @@ export default function AllApplication() {
 
                     {/* Expanded details */}
                     {candidate.expanded && (
-                      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                      <div className="px-6 py-4 bg-blue-200 border-t border-gray-100">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="space-y-4">
                             <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
