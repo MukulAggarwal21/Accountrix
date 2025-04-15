@@ -17,11 +17,12 @@ import {
 import MainDashboard from './MainDashboard';
 import Navigation from './Navigation';
 import ViewJobs from './ViewJobs';
-import JobList from './JobList';
+import JobList from './PostedJobs/JobList';
 import ComingSoon from './ComingSoon';
 import InterviewSchedule from './Interview/InterviewSchedule';
 import JobPosting from './JobPosting';
 import AllApplication from './Applications/AllApplication';
+import RecruiterProfile from './Profile/RecruiterProfile';
 
 
 export default function Dashboard() {
@@ -168,7 +169,7 @@ export default function Dashboard() {
 
         {step == 5 && <JobList />}
         {step == 6 && <ComingSoon />}
-        {step == 7 && <ComingSoon />}
+        {step == 7 && <RecruiterProfile />}
 
 
         {step == 8 && <JobPosting setStep={setStep} step={step}/>}

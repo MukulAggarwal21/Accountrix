@@ -66,7 +66,7 @@ import Features from '../Features/Features';
 import Statistics from '../Statistics/Statistics';
 import Newsletter from '../Subscription/Subscription';
 import Partners from '../Partners/Partners';
-import ProfileSetup from '../Recruiter/ProfileSetup';
+import Dashboard from '../Recruiter/Dashboard/Landing';
 function Landing() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userType, setUserType] = useState(null); // 'student' or 'recruiter'
@@ -102,7 +102,7 @@ function Landing() {
                     userType === 'student' ? (
                         <BrandHiring />
                     ) : (
-                        <ProfileSetup />
+                        <Dashboard />
                     )
                 ) : (
                     <LandingMain setIsAuthenticated={setIsAuthenticated} setUserType={setUserType} />

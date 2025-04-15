@@ -14,10 +14,11 @@ import Analytics from './components/Recruiter/Dashboard/Analytics';
 import Testing from './components/Recruiter/Dashboard/testing';
 import JobPosting from './components/Recruiter/Dashboard/JobPosting';
 import RecruiterSetup from './components/Recruiter/SignupInfo/RecruiterSetup';
-import JobList from './components/Recruiter/Dashboard/JobList';
-import ComingSoon from './components/Recruiter/Dashboard/ComingSoon';
+import JobList from './components/Recruiter/Dashboard/PostedJobs/JobList';
 import InterviewSchedule from './components/Recruiter/Dashboard/Interview/InterviewSchedule';
 import AllApplication from './components/Recruiter/Dashboard/Applications/AllApplication';
+import RecruiterProfile from './components/Recruiter/Dashboard/Profile/RecruiterProfile';
+
 function App() {
 
   return (
@@ -38,7 +39,6 @@ function App() {
         <Route path="/jobposting" element={<JobPosting />} />
         <Route path="/recruitersetup" element={<RecruiterSetup />} />
         <Route path="/joblist" element={<JobList />} />
-        <Route path="/soon" element={<ComingSoon />} />
         <Route path="/allapplication" element={<AllApplication />} />
       </Routes>
 
