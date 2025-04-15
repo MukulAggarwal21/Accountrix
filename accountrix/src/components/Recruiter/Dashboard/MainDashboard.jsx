@@ -113,7 +113,7 @@ export default function MainDashboard({ stats, recentApplications, upcomingInter
                         </div>
 
                         <div className="mt-4 text-center">
-                            <button  className="text-sm font-medium text-indigo-600 hover:text-indigo-900">
+                            <button onClick={()=>{setStep(2)}}  className="text-sm font-medium text-indigo-600 hover:text-indigo-900">
                                 View All Applications
                             </button>
                         </div>

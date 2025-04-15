@@ -17,6 +17,7 @@ import RecruiterSetup from './components/Recruiter/SignupInfo/RecruiterSetup';
 import JobList from './components/Recruiter/Dashboard/JobList';
 import ComingSoon from './components/Recruiter/Dashboard/ComingSoon';
 import InterviewSchedule from './components/Recruiter/Dashboard/Interview/InterviewSchedule';
+import AllApplication from './components/Recruiter/Dashboard/Applications/AllApplication';
 function App() {
 
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/recruitersetup" element={<RecruiterSetup />} />
         <Route path="/joblist" element={<JobList />} />
         <Route path="/soon" element={<ComingSoon />} />
+        <Route path="/allapplication" element={<AllApplication />} />
       </Routes>
 
     </Router>

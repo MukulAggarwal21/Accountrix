@@ -21,7 +21,7 @@ import JobList from './JobList';
 import ComingSoon from './ComingSoon';
 import InterviewSchedule from './Interview/InterviewSchedule';
 import JobPosting from './JobPosting';
-
+import AllApplication from './Applications/AllApplication';
 
 
 export default function Dashboard() {
@@ -73,42 +73,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* <div className="flex-1 space-y-1 px-2 py-4">
-          <div onClick={() => setStep(1)} className="flex items-center rounded-lg bg-indigo-800 px-4 py-3 text-white">
-            <BriefcaseBusiness className="mr-3" size={20} />
-            <span className="text-sm font-medium">Dashboard</span>
-          </div>
-
-          <div onClick={() => setStep(2)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <Users className="mr-3" size={20} />
-            <span className="text-sm font-medium">Candidates</span>
-          </div>
-
-          <div onClick={() => setStep(3)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <Calendar className="mr-3" size={20} />
-            <span className="text-sm font-medium">Interviews</span>
-          </div>
-
-          <div onClick={() => setStep(4)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <MessageSquare className="mr-3" size={20} />
-            <span className="text-sm font-medium">Messages</span>
-          </div>
-
-          <div onClick={() => setStep(5)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <BarChart3 className="mr-3" size={20} />
-            <span className="text-sm font-medium">Jobs</span>
-          </div>
-          <div onClick={() => setStep(6)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <Star className="mr-3" size={20} />
-            <span className="text-sm font-medium">  Blogs</span>
-          </div>
-
-          <div onClick={() => setStep(7)} className="flex items-center rounded-lg px-4 py-3 text-indigo-100 hover:bg-indigo-800">
-            <Users className="mr-3" size={20} />
-            <span className="text-sm font-medium">Profile</span>
-          </div>
-        </div> */}
-
+       
         <div className="flex-1 space-y-1 px-2 py-4">
           <div
             onClick={() => setStep(1)}
@@ -197,7 +162,7 @@ export default function Dashboard() {
         {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
 
         {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
-        {step == 2 && <ComingSoon/>}
+        {step == 2 && <AllApplication/>}
         {step == 3 && <InterviewSchedule/>}
         {step == 4 && <ComingSoon />}
 
