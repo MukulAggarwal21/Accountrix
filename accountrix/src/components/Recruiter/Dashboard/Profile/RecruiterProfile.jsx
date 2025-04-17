@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { User, Building, Mail, Globe, MapPin, Users, Award, Phone, Edit, Clock, Calendar, Briefcase, Check } from 'lucide-react';
 import ProfileStatsCard from './ProfileStatsCard';
+import MainContent from './MainContent';
 
 export default function RecruiterProfile() {
   const [activeTab, setActiveTab] = useState('profile');
-  
+
   // Sample data - in a real app this would come from API/props
   const profileData = {
     name: "Sarah Johnson",
@@ -45,8 +46,8 @@ export default function RecruiterProfile() {
       <div className="max-w-7xl  mx-auto">
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow overflow-hidden mb-6">
-          <div 
-            className="h-32 w-full" 
+          <div
+            className="h-32 w-full"
             style={{ backgroundColor: profileData.colors.primary }}
           />
           <div className="px-6 py-4 flex flex-col md:flex-row items-start md:items-end relative">
@@ -70,43 +71,39 @@ export default function RecruiterProfile() {
           </div>
           <div className="border-t border-gray-200">
             <nav className="flex overflow-x-auto">
-              <button 
+              <button
                 onClick={() => setActiveTab('profile')}
-                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'profile' 
-                    ? 'border-b-2 border-blue-600 text-blue-600' 
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'profile'
+                    ? 'border-b-2 border-blue-600 text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 Profile
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('team')}
-                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'team' 
-                    ? 'border-b-2 border-blue-600 text-blue-600' 
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'team'
+                    ? 'border-b-2 border-blue-600 text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 Team
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('activity')}
-                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'activity' 
-                    ? 'border-b-2 border-blue-600 text-blue-600' 
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'activity'
+                    ? 'border-b-2 border-blue-600 text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 Activity
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('settings')}
-                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-                  activeTab === 'settings' 
-                    ? 'border-b-2 border-blue-600 text-blue-600' 
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'settings'
+                    ? 'border-b-2 border-blue-600 text-blue-600'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 Settings
               </button>
@@ -115,164 +112,13 @@ export default function RecruiterProfile() {
         </div>
 
         {/* Profile Stats Cards */}
-      
-        <ProfileStatsCard profileData={profileData}/>
+
+        <ProfileStatsCard profileData={profileData} />
 
         {/* Main Content Area */}
         {activeTab === 'profile' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Company Information</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <Building className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Company Name</p>
-                        <p className="mt-1">{profileData.company}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Mail className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Work Email</p>
-                        <p className="mt-1">{profileData.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Globe className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Website</p>
-                        <p className="mt-1">{profileData.website}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <MapPin className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Location</p>
-                        <p className="mt-1">{profileData.location}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Market</p>
-                        <p className="mt-1">{profileData.market}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Users className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Employees</p>
-                        <p className="mt-1">{profileData.employees}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow overflow-hidden mt-6">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Your Information</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <User className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Name</p>
-                        <p className="mt-1">{profileData.name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Phone className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Phone</p>
-                        <p className="mt-1">{profileData.phone}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 text-gray-400 mt-1 mr-3" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Your Role</p>
-                        <p className="mt-1">{profileData.role}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Subscription Plan</h2>
-                </div>
-                <div className="p-6">
-                  <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-blue-700">{profileData.planType}</h3>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">Active</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-2">
-                    {profileData.planFeatures.map((feature, index) => (
-                      <li key={index} className="flex items-center">
-                        <Check size={16} className="text-green-500 mr-2" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-4">
-                    <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                      Manage Subscription
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow overflow-hidden mt-6">
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Company Branding</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Primary Color</p>
-                      <div className="mt-1 flex items-center">
-                        <div 
-                          className="h-6 w-6 rounded-full mr-2" 
-                          style={{ backgroundColor: profileData.colors.primary }}
-                        />
-                        <span>{profileData.colors.primary}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Secondary Color</p>
-                      <div className="mt-1 flex items-center">
-                        <div 
-                          className="h-6 w-6 rounded-full mr-2" 
-                          style={{ backgroundColor: profileData.colors.secondary }}
-                        />
-                        <span>{profileData.colors.secondary}</span>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <button className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                        <Edit size={16} className="mr-2" />
-                        Edit Branding
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MainContent profileData={profileData} />
         )}
-
         {/* Team Tab */}
         {activeTab === 'team' && (
           <div className="bg-white rounded-xl shadow">
@@ -426,7 +272,7 @@ export default function RecruiterProfile() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="pt-5 border-t border-gray-200">
                       <h3 className="text-sm font-medium text-gray-900">Privacy Settings</h3>
                       <div className="mt-4 space-y-4">
@@ -472,7 +318,7 @@ export default function RecruiterProfile() {
                       Manage API Keys
                     </button>
                   </div>
-                  
+
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <h3 className="text-sm font-medium text-gray-900 mb-4">Account Actions</h3>
                     <button className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-left">
