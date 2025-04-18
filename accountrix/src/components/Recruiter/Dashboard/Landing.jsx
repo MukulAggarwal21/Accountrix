@@ -23,7 +23,7 @@ import InterviewSchedule from './Interview/InterviewSchedule';
 import JobPosting from './JobPosting';
 import AllApplication from './Applications/AllApplication';
 import RecruiterProfile from './Profile/RecruiterProfile';
-
+import RecruiterBlogDashboard from './Blog/Blog';
 
 export default function Dashboard() {
   // const navigate = useNavigate();
@@ -168,7 +168,7 @@ export default function Dashboard() {
         {step == 4 && <ComingSoon />}
 
         {step == 5 && <JobList />}
-        {step == 6 && <ComingSoon />}
+        {step == 6 && <RecruiterBlogDashboard />}
         {step == 7 && <RecruiterProfile />}
 
 

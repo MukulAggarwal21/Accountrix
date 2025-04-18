@@ -18,6 +18,7 @@ import JobList from './components/Recruiter/Dashboard/PostedJobs/JobList';
 import InterviewSchedule from './components/Recruiter/Dashboard/Interview/InterviewSchedule';
 import AllApplication from './components/Recruiter/Dashboard/Applications/AllApplication';
 import RecruiterProfile from './components/Recruiter/Dashboard/Profile/RecruiterProfile';
+import BlogPage from './components/Recruiter/Dashboard/Blog/Blog';
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="/recruitersetup" element={<RecruiterSetup />} />
         <Route path="/joblist" element={<JobList />} />
         <Route path="/allapplication" element={<AllApplication />} />
+        <Route path="/blog" element={<BlogPage />} />
       </Routes>
 
     </Router>
