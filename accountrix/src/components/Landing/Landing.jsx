@@ -83,31 +83,16 @@ function Landing() {
                         : 'bg-[radial-gradient(circle_at_center,rgba(0,0,200,0.3)_0%,rgba(0,0,0,0.9)_70%)]'
                     }`}> </div>
 
-                {/* Navbar */}
-                <div>
-                    {/* <Navbar /> */}
-
-                </div>
-
-
-                {/* Main Content */}
-
-                {/* {isAuthenticated ? (
-                    <BrandHiring className="bg-red-900" />
-                ) : (
-                    <LandingMain setIsAuthenticated={setIsAuthenticated} />
-                )} */}
 
                 {isAuthenticated ? (
                     userType === 'student' ? (
                         <BrandHiring />
                     ) : (
-                        <Dashboard />
+                        <Dashboard/>
                     )
                 ) : (
                     <LandingMain setIsAuthenticated={setIsAuthenticated} setUserType={setUserType} />
                 )}
-
             </div>
             <HeroSection />
 
