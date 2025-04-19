@@ -32,7 +32,7 @@ export default function JobPosting( { step , setStep}) {
   const [skillInput, setSkillInput] = useState('');
   const [showTimezoneSelector, setShowTimezoneSelector] = useState(false);
 
-  const totalSteps = 5;
+  const totalSteps = 4;
 
   const jobRoles = [
     'Software Engineer', 'Product Manager', 'UX Designer', 'Data Scientist',
@@ -45,18 +45,18 @@ export default function JobPosting( { step , setStep}) {
     'Senior (5-8 years)', 'Lead/Principal (8+ years)', 'Executive'
   ];
 
-  const companyBenefits = [
-    { id: 1, name: 'Health Insurance', selected: true },
-    { id: 2, name: 'Dental Insurance', selected: true },
-    { id: 3, name: 'Vision Insurance', selected: true },
-    { id: 4, name: '401(k) Plan', selected: false },
-    { id: 5, name: 'Flexible Work Hours', selected: false },
-    { id: 6, name: 'Remote Work Option', selected: false },
-    { id: 7, name: 'Professional Development', selected: false },
-    { id: 8, name: 'Paid Time Off', selected: true },
-    { id: 9, name: 'Parental Leave', selected: false },
-    { id: 10, name: 'Gym Membership', selected: false },
-  ];
+  // const companyBenefits = [
+  //   { id: 1, name: 'Health Insurance', selected: true },
+  //   { id: 2, name: 'Dental Insurance', selected: true },
+  //   { id: 3, name: 'Vision Insurance', selected: true },
+  //   { id: 4, name: '401(k) Plan', selected: false },
+  //   { id: 5, name: 'Flexible Work Hours', selected: false },
+  //   { id: 6, name: 'Remote Work Option', selected: false },
+  //   { id: 7, name: 'Professional Development', selected: false },
+  //   { id: 8, name: 'Paid Time Off', selected: true },
+  //   { id: 9, name: 'Parental Leave', selected: false },
+  //   { id: 10, name: 'Gym Membership', selected: false },
+  // ];
 
   const timezones = ['GMT-12', 'GMT-11', 'GMT-10', 'GMT-9', 'GMT-8', 'GMT-7', 'GMT-6', 'GMT-5', 'GMT-4', 'GMT-3', 'GMT-2', 'GMT-1', 'GMT+0', 'GMT+1', 'GMT+2', 'GMT+3', 'GMT+4', 'GMT+5', 'GMT+6', 'GMT+7', 'GMT+8', 'GMT+9', 'GMT+10', 'GMT+11', 'GMT+12'];
 
@@ -270,43 +270,43 @@ const renderStep3 = () => {
     </div>
   );
 };
+// const renderStep4 = () => {
+//   return (
+//     <div className="space-y-6">
+//       <h2 className="text-xl font-bold text-gray-900">Job Benefits</h2>
+
+//       <div className="space-y-4">
+//         <div>
+//           <label className="block text-sm font-medium text-gray-700 mb-1">
+//             Benefits Offered
+//           </label>
+//           <div className="grid grid-cols-2 gap-2">
+//             {companyBenefits.map((benefit) => (
+//               <label key={benefit.id} className="flex items-center space-x-2">
+//                 <input
+//                   type="checkbox"
+//                   checked={benefit.selected}
+//                   onChange={() =>
+//                     setCompanyBenefits((prev) =>
+//                       prev.map((b) =>
+//                         b.id === benefit.id
+//                           ? { ...b, selected: !b.selected }
+//                           : b
+//                       )
+//                     )
+//                   }
+//                 />
+//                 <span>{benefit.name}</span>
+//               </label>
+//             ))}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
 const renderStep4 = () => {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Job Benefits</h2>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Benefits Offered
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {companyBenefits.map((benefit) => (
-              <label key={benefit.id} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={benefit.selected}
-                  onChange={() =>
-                    setCompanyBenefits((prev) =>
-                      prev.map((b) =>
-                        b.id === benefit.id
-                          ? { ...b, selected: !b.selected }
-                          : b
-                      )
-                    )
-                  }
-                />
-                <span>{benefit.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const renderStep5 = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-gray-900">Review & Submit</h2>
@@ -333,7 +333,7 @@ const renderStep5 = () => {
     {currentStep === 2 && renderStep2()}
     {currentStep === 3 && renderStep3()}
     {currentStep === 4 && renderStep4()}
-    {currentStep === 5 && renderStep5()}
+    {/* {currentStep === 5 && renderStep5()} */}
 
     <div className="mt-8 flex justify-between">
       <button
@@ -357,7 +357,7 @@ const renderStep5 = () => {
      
       <button
   onClick={
-    currentStep === 5
+    currentStep === 4
       ? () => {
           if (!setStep) {
             console.error("setStep is not defined");
@@ -375,7 +375,7 @@ const renderStep5 = () => {
       : "bg-indigo-600 hover:bg-indigo-700"
   }`}
 >
-  {currentStep === 5 ? "Submit Job Posting" : "Next"}
+  {currentStep === 4 ? "Submit Job Posting" : "Next"}
 </button>
     </div>
   </div>
