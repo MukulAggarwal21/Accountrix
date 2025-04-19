@@ -19,7 +19,7 @@ import InterviewSchedule from './components/Recruiter/Dashboard/Interview/Interv
 import AllApplication from './components/Recruiter/Dashboard/Applications/AllApplication';
 import RecruiterProfile from './components/Recruiter/Dashboard/Profile/RecruiterProfile';
 import BlogPage from './components/Recruiter/Dashboard/Blog/Blog';
-
+import NotificationPage from './components/Recruiter/Dashboard/Notification/Notification';
 function App() {
 
   return (
@@ -42,6 +42,7 @@ function App() {
         <Route path="/joblist" element={<JobList />} />
         <Route path="/allapplication" element={<AllApplication />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/notification" element={<NotificationPage />} />
       </Routes>
 
     </Router>

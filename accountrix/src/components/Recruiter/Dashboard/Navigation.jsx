@@ -1,4 +1,5 @@
 import React from 'react'
+// import NotificationPage from './Notification/Notification';
 import {
     Search,
 
@@ -6,7 +7,10 @@ import {
     Menu,
 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 export default function Navigation({ setSidebarOpen }) {
+    const navigate = useNavigate()
     return (
         <header className="flex h-16 items-center justify-between border-b bg-white px-6">
             <div className="flex items-center">
@@ -27,7 +31,9 @@ export default function Navigation({ setSidebarOpen }) {
             </div>
 
             <div className="flex items-center space-x-4">
-                <button className="relative text-gray-600 hover:text-gray-900">
+                <button onClick={()=>{
+                    navigate('/notification')
+                }} className="relative text-gray-600 hover:text-gray-900">
                     <BellRing size={22} />
                     <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
                         3
