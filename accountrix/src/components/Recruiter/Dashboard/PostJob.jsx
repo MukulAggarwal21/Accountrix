@@ -9,7 +9,7 @@ const PostJob = () => {
         requirements: '',
     });
 
-    const handleChange = (e) => {
+     const handleChange = (e) => {
         const { name, value } = e.target;
         setJobData({ ...jobData, [name]: value });
     };

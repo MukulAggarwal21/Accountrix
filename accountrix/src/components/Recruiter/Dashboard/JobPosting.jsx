@@ -1,9 +1,7 @@
-
 import { useState } from 'react';
+import axios from 'axios';
 import {
-  ChevronLeft,
-  X,
-  Clock,
+  ChevronLeft, X, Clock,
   Building,
   MapPin,
   Globe,
@@ -15,71 +13,103 @@ import {
   CheckCircle,
   Info,
   Upload,
+  PlusCircleIcon,
   Plus,
   Minus
 } from 'lucide-react';
-
-export default function JobPosting( { step , setStep}) {
+export default function JobPosting({ step, setStep }) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [jobType, setJobType] = useState('full-time');
-  const [remotePolicy, setRemotePolicy] = useState('');
-  const [relocate, setRelocate] = useState('');
-  const [visa, setVisa] = useState('');
-  const [remoteCulture, setRemoteCulture] = useState('');
-  const [tags, setTags] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [tagInput, setTagInput] = useState('');
-  const [skillInput, setSkillInput] = useState('');
-  const [showTimezoneSelector, setShowTimezoneSelector] = useState(false);
+  const [jobData, setJobData] = useState({
+    jobTitle: '',
+    jobDescription: '',
+    companyName: '',
+    location: '',
+    website: '',
+    companyDescription: '',
+    // detail: [{ label: '', value: '' }],
+    skills: [],
+    salary: { currency: 'INR', amount: '' },
+    workPolicy: '',
+  });
 
   const totalSteps = 4;
 
-  const jobRoles = [
-    'Software Engineer', 'Product Manager', 'UX Designer', 'Data Scientist',
-    'DevOps Engineer', 'Marketing Specialist', 'Sales Representative',
-    'Customer Success Manager', 'Human Resources', 'Financial Analyst'
-  ];
 
-  const experienceLevels = [
-    'Entry level (0-2 years)', 'Mid level (3-5 years)',
-    'Senior (5-8 years)', 'Lead/Principal (8+ years)', 'Executive'
-  ];
+  // const addDetail = () => {
+  //   setJobData({
+  //     ...jobData,
+  //     detail: [...jobData.detail, { label: '', value: '' }],
+  //   })
+  // }
 
-  // const companyBenefits = [
-  //   { id: 1, name: 'Health Insurance', selected: true },
-  //   { id: 2, name: 'Dental Insurance', selected: true },
-  //   { id: 3, name: 'Vision Insurance', selected: true },
-  //   { id: 4, name: '401(k) Plan', selected: false },
-  //   { id: 5, name: 'Flexible Work Hours', selected: false },
-  //   { id: 6, name: 'Remote Work Option', selected: false },
-  //   { id: 7, name: 'Professional Development', selected: false },
-  //   { id: 8, name: 'Paid Time Off', selected: true },
-  //   { id: 9, name: 'Parental Leave', selected: false },
-  //   { id: 10, name: 'Gym Membership', selected: false },
-  // ];
 
-  const timezones = ['GMT-12', 'GMT-11', 'GMT-10', 'GMT-9', 'GMT-8', 'GMT-7', 'GMT-6', 'GMT-5', 'GMT-4', 'GMT-3', 'GMT-2', 'GMT-1', 'GMT+0', 'GMT+1', 'GMT+2', 'GMT+3', 'GMT+4', 'GMT+5', 'GMT+6', 'GMT+7', 'GMT+8', 'GMT+9', 'GMT+10', 'GMT+11', 'GMT+12'];
+  // const addDetail = () => {
+  //   setJobData((prev) => ({
+  //     ...prev,
+  //     detail: [...prev.detail, { label: '', value: '' }],
+  //   }));
+  // };
 
-  const handleAddTag = () => {
-    if (tagInput && !tags.includes(tagInput)) {
-      setTags([...tags, tagInput]);
-      setTagInput('');
+  // const handleDetailChange = (index, field, value) => {
+  //   const updatedDetails = [...jobData.detail];
+  //   updatedDetails[index][field] = value;
+  //   setJobData((prev) => ({
+  //     ...prev,
+  //     detail: updatedDetails,
+  //   }));
+  // };
+
+  // const removeDetail = (index) => {
+  //   const updatedDetails = jobData.detail.filter((_, i) => i !== index);
+  //   setJobData((prev) => ({
+  //     ...prev,
+  //     detail: updatedDetails,
+  //   }));
+  // };
+
+  const handleSubmit = async () => {
+    const apiBaseUrl = 'http://localhost:5000';
+
+    try {
+      const response = await axios.post(`${apiBaseUrl}/jobs`, jobData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        console.log('Job posting submitted successfully:', response.data);
+        setStep(1); // Reset the form or navigate to another page
+      }
+    } catch (error) {
+      console.error('Error submitting job posting:', error);
     }
   };
 
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+
+
+  const handleInputChange = (field, value) => {
+    setJobData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const handleAddSkill = () => {
-    if (skillInput && !skills.includes(skillInput)) {
-      setSkills([...skills, skillInput]);
-      setSkillInput('');
+    if (jobData.skillInput && !jobData.skills.includes(jobData.skillInput)) {
+      setJobData((prev) => ({
+        ...prev,
+        skills: [...prev.skills, jobData.skillInput],
+        skillInput: '',
+      }));
     }
   };
 
   const handleRemoveSkill = (skillToRemove) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
+    setJobData((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((skill) => skill !== skillToRemove),
+    }));
   };
 
   const handleNextStep = () => {
@@ -130,6 +160,8 @@ export default function JobPosting( { step , setStep}) {
             <input
               type="text"
               placeholder="e.g. Senior Frontend Developer"
+              value={jobData.jobTitle}
+              onChange={(e) => handleInputChange('jobTitle', e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
@@ -138,246 +170,292 @@ export default function JobPosting( { step , setStep}) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Job Description <span className="text-red-500">*</span>
             </label>
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 border-b border-gray-300 px-4 py-2 flex items-center justify-between">
-                <div className="flex space-x-4">
-                  <button className="text-gray-600 hover:text-gray-900">
-                    <span className="font-medium">B</span>
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    <span className="italic">I</span>
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    <span className="underline">U</span>
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    • List
-                  </button>
-                </div>
-                <button className="text-xs text-indigo-600 hover:text-indigo-800">
-                  Use AI to generate description
+            <textarea
+              rows="6"
+              placeholder="Describe the responsibilities of the position. You can always update this later."
+              value={jobData.jobDescription}
+              onChange={(e) => handleInputChange('jobDescription', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            ></textarea>
+          </div>
+
+          {/* <div className="space-y-4">
+            {jobData.detail.map((detail, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <input
+                  type="text"
+                  placeholder="Label"
+                  value={detail.label}
+                  onChange={(e) => handleDetailChange(index, 'label', e.target.value)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Value"
+                  value={detail.value}
+                  onChange={(e) => handleDetailChange(index, 'value', e.target.value)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeDetail(index)}
+                  className="px-3 py-2 text-red-600 hover:text-red-800"
+                >
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-              <textarea
-                rows="6"
-                placeholder="Describe the responsibilities of the position. You can always update this later."
-                className="w-full px-4 py-2 border-none focus:outline-none"
-              ></textarea>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={addDetail}
+            className="mt-4 px-5 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200 flex items-center"
+          >
+            <PlusCircleIcon className="h-5 w-5 mr-2" />
+            Add Another Detail
+          </button> */}
+
+
+          {/* New Salary Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Salary
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={jobData.salary.currency}
+                onChange={(e) =>
+                  setJobData((prev) => ({
+                    ...prev,
+                    salary: { ...prev.salary, currency: e.target.value },
+                  }))
+                }
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="INR">INR</option>
+                <option value="GBP">GBP</option>
+              </select>
+              <input
+                type="number"
+                placeholder="e.g. 50000"
+                value={jobData.salary.amount}
+                onChange={(e) =>
+                  setJobData((prev) => ({
+                    ...prev,
+                    salary: { ...prev.salary, amount: e.target.value },
+                  }))
+                }
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          {/* New Work Policy Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Work Policy
+            </label>
+            <select
+              value={jobData.workPolicy}
+              onChange={(e) => handleInputChange('workPolicy', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">Select Work Policy</option>
+              <option value="Remote">Remote</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="InOffice">In Office</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+    );
+  };
+
+  const renderStep2 = () => {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-bold text-gray-900">Company Details</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Company Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Acme Corporation"
+              value={jobData.companyName}
+              onChange={(e) => handleInputChange('companyName', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. New York, NY"
+              value={jobData.location}
+              onChange={(e) => handleInputChange('location', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Company Website
+            </label>
+            <input
+              type="url"
+              placeholder="https://yourcompany.com"
+              value={jobData.website}
+              onChange={(e) => handleInputChange('website', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Company Description
+            </label>
+            <textarea
+              rows="4"
+              placeholder="Write a brief about the company"
+              value={jobData.companyDescription}
+              onChange={(e) => handleInputChange('companyDescription', e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStep3 = () => {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-bold text-gray-900">Required Skills</h2>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Add Skills
+            </label>
+            <div className="flex gap-2">
+              <input
+                value={jobData.skillInput || ''}
+                onChange={(e) => handleInputChange('skillInput', e.target.value)}
+                placeholder="e.g. React, Node.js"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <button
+                onClick={handleAddSkill}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {jobData.skills.map((skill, idx) => (
+              <span
+                key={idx}
+                className="flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full"
+              >
+                {skill}
+                <X
+                  className="ml-2 w-4 h-4 cursor-pointer hover:text-red-600"
+                  onClick={() => handleRemoveSkill(skill)}
+                />
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStep4 = () => {
+    return (
+      <div className="space-y-6  - overflow-y-auto">
+        <h2 className="text-xl font-bold text-gray-900">Review & Submit</h2>
+
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Please review all the details you have entered before submitting the
+            job posting.
+          </p>
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-bold text-gray-900">Job Title:</h3>
+              <p>{jobData.jobTitle}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Job Description:</h3>
+              <p>{jobData.jobDescription}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Company Name:</h3>
+              <p>{jobData.companyName}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Location:</h3>
+              <p>{jobData.location}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Company Website:</h3>
+              <p>{jobData.website}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Company Description:</h3>
+              <p>{jobData.companyDescription}</p>
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900">Skills:</h3>
+              <p>{jobData.skills.join(', ')}</p>
             </div>
           </div>
         </div>
       </div>
     );
-
-
   };
 
-  const renderStep2 = () => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Company Details</h2>
+    <div className="px-8 py-8 overflow-y-auto">
+      {renderProgressBar()}
+      {currentStep === 1 && renderStep1()}
+      {currentStep === 2 && renderStep2()}
+      {currentStep === 3 && renderStep3()}
+      {currentStep === 4 && renderStep4()}
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Company Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. Acme Corporation"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Location <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. New York, NY"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Company Website
-          </label>
-          <input
-            type="url"
-            placeholder="https://yourcompany.com"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Company Description
-          </label>
-          <textarea
-            rows="4"
-            placeholder="Write a brief about the company"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          ></textarea>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const renderStep3 = () => {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Required Skills</h2>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Add Skills
-          </label>
-          <div className="flex gap-2">
-            <input
-              value={skillInput}
-              onChange={(e) => setSkillInput(e.target.value)}
-              placeholder="e.g. React, Node.js"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            <button
-              onClick={handleAddSkill}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Add
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {skills.map((skill, idx) => (
-            <span
-              key={idx}
-              className="flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full"
-            >
-              {skill}
-              <X
-                className="ml-2 w-4 h-4 cursor-pointer hover:text-red-600"
-                onClick={() => handleRemoveSkill(skill)}
-              />
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-// const renderStep4 = () => {
-//   return (
-//     <div className="space-y-6">
-//       <h2 className="text-xl font-bold text-gray-900">Job Benefits</h2>
-
-//       <div className="space-y-4">
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">
-//             Benefits Offered
-//           </label>
-//           <div className="grid grid-cols-2 gap-2">
-//             {companyBenefits.map((benefit) => (
-//               <label key={benefit.id} className="flex items-center space-x-2">
-//                 <input
-//                   type="checkbox"
-//                   checked={benefit.selected}
-//                   onChange={() =>
-//                     setCompanyBenefits((prev) =>
-//                       prev.map((b) =>
-//                         b.id === benefit.id
-//                           ? { ...b, selected: !b.selected }
-//                           : b
-//                       )
-//                     )
-//                   }
-//                 />
-//                 <span>{benefit.name}</span>
-//               </label>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-const renderStep4 = () => {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">Review & Submit</h2>
-
-      <div className="space-y-4">
-        <p className="text-gray-700">
-          Please review all the details you have entered before submitting the
-          job posting.
-        </p>
-        {/* <button
-          
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+      <div className="mt-8 flex justify-between">
+        <button
+          onClick={handlePrevStep}
+          disabled={currentStep === 1}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
         >
-          Submit Job Posting
-        </button> */}
+          <ChevronLeft className="inline-block w-4 h-4 mr-1" /> Previous
+        </button>
+
+        <button
+          onClick={currentStep === 4 ? handleSubmit : handleNextStep}
+
+          className={`px-4 py-2 text-white rounded ${currentStep === 4
+            ? 'bg-green-600 hover:bg-green-700'
+            : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+        >
+          {currentStep === 4 ? 'Submit Job Posting' : 'Next'}
+        </button>
       </div>
     </div>
   );
-};
- return (
-  <div className="  px-8 py-8">
-    {renderProgressBar()}
-    {currentStep === 1 && renderStep1()}
-    {currentStep === 2 && renderStep2()}
-    {currentStep === 3 && renderStep3()}
-    {currentStep === 4 && renderStep4()}
-    {/* {currentStep === 5 && renderStep5()} */}
-
-    <div className="mt-8 flex justify-between">
-      <button
-        onClick={handlePrevStep}
-        disabled={currentStep === 1}
-        className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
-      >
-        <ChevronLeft className="inline-block w-4 h-4 mr-1" /> Previous
-      </button>
-      {/* <button
-        onClick={currentStep===5 ? ()=>{
-         setStep(1);
-         console.log("button clickedddd")
-        } : handleNextStep}
-        disabled={currentStep === totalSteps}
-        className={`px-4 py-2 text-white rounded ${
-        currentStep == 5 ? "bg-green-600 hover:bg-green-700" : "bg-indigo-600 hover:bg-indigo-700 "}`}
-      >
-       {currentStep === 5 ? "Submit Job Posting" :"Next"}
-      </button> */}
-     
-      <button
-  onClick={
-    currentStep === 4
-      ? () => {
-          if (!setStep) {
-            console.error("setStep is not defined");
-            return;
-          }
-          setStep(1);
-          console.log("button clickedddd");
-        }
-      : handleNextStep
-  }
-  disabled={currentStep === totalSteps}
-  className={`px-4 py-2 text-white rounded ${
-    currentStep === 5
-      ? "bg-green-600 hover:bg-green-700"
-      : "bg-indigo-600 hover:bg-indigo-700"
-  }`}
->
-  {currentStep === 4 ? "Submit Job Posting" : "Next"}
-</button>
-    </div>
-  </div>
-);
 }
