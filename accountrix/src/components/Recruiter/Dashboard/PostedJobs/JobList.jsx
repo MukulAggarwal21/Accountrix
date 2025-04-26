@@ -30,18 +30,34 @@ export default function JobList() {
     status: 'Active',
   });
 
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       const response = await axios.get('http://localhost:5000/jobs'); // Replace with your API endpoint
+  //       setJobs(response.data); // Assuming the API returns an array of jobs
+  //     } catch (error) {
+  //       console.error('Error fetching jobs:', error);
+  //     }
+  //   };
+
+  //   fetchJobs();
+  // }, []);
+
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/jobs'); // Replace with your API endpoint
-        setJobs(response.data); // Assuming the API returns an array of jobs
+        const response = await axios.get('http://localhost:5000/jobs');
+        setJobs(response.data); // response.data is the array of jobs
       } catch (error) {
         console.error('Error fetching jobs:', error);
       }
     };
 
     fetchJobs();
-  }, []);
+  }, [jobs]);
+
+
 
   // Filter jobs based on search term
   const filteredJobs = jobs.filter(job =>
@@ -56,7 +72,10 @@ export default function JobList() {
   };
 
   const handleEdit = (job) => {
-    setEditingJob({ ...job });
+    setEditingJob({
+      ...job,
+      id: job._id, // ensure id is properly set
+    });
     setViewingJob(null);
   };
 
@@ -64,9 +83,10 @@ export default function JobList() {
     setShowDeleteConfirm(id);
   };
 
+
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${showDeleteConfirm}`);
+      await axios.delete(`http://localhost:5000/jobs/${showDeleteConfirm}`);
       setJobs(jobs.filter((job) => job.id !== showDeleteConfirm));
       setShowDeleteConfirm(null);
     } catch (error) {
@@ -74,10 +94,11 @@ export default function JobList() {
     }
   };
 
+
   const handleSaveEdit = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/jobs/${editingJob.id}`,
+        `http://localhost:5000/jobs/${editingJob.id}`,
         editingJob
       );
       setJobs(jobs.map((job) => (job.id === editingJob.id ? response.data : job)));
@@ -86,6 +107,8 @@ export default function JobList() {
       console.error('Error saving job:', error);
     }
   };
+
+
 
   const handleAddJob = async () => {
     try {
@@ -199,7 +222,7 @@ export default function JobList() {
                       <Users className="mr-2" size={16} />
                       <span className="text-sm">{job.applicants || 0} Applicants</span>
                     </div>
-                    <span className="text-xs text-gray-500">{job.postedDate || 'Recently'}</span>
+                    <span className="text-xs text-gray-500">{job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'Recently'}</span>
                   </div>
 
                   <div className="mt-4 flex justify-between items-center">
@@ -259,6 +282,8 @@ export default function JobList() {
                   {viewingJob.salary?.currency || ''} {viewingJob.salary?.amount || viewingJob.salary || ''}
                 </span>
                 <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">{viewingJob.status || 'Active'}</span>
+                <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">{viewingJob.workPolicy || 'Remote'}</span>
+
               </div>
 
               <div className="mb-4">
@@ -344,18 +369,17 @@ export default function JobList() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input
-                      type="text"
-                      value={editingJob.location}
-                      onChange={(e) => setEditingJob({ ...editingJob, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={editingJob.location}
+                    onChange={(e) => setEditingJob({ ...editingJob, location: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
 
-                  <div>
+                {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
                     <input
                       type="text"
@@ -363,8 +387,49 @@ export default function JobList() {
                       onChange={(e) => setEditingJob({ ...editingJob, salary: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     />
+                  </div> */}
+
+                <div className="  grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <select
+                      value={editingJob.salary.currency}
+                      onChange={(e) =>
+                        setEditingJob({
+                          ...editingJob,
+                          salary: { ...editingJob.salary, currency: e.target.value }
+                        })
+                      }
+                      className=" w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="INR">INR</option>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="GBP">GBP</option>
+                      {/* Add more currencies if needed */}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Salary Amount</label>
+                    <input
+                      type="number"
+                      value={editingJob.salary.amount}
+                      onChange={(e) =>
+                        setEditingJob({
+                          ...editingJob,
+                          salary: { ...editingJob.salary, amount: e.target.value }
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mb-4"
+                    />
+
+
                   </div>
                 </div>
+
+
+
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -376,6 +441,19 @@ export default function JobList() {
                     <option value="Active">Active</option>
                     <option value="Paused">Paused</option>
                     <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Work Policy</label>
+                  <select
+                    value={editingJob.workPolicy || 'Remote'}
+                    onChange={(e) => setEditingJob({ ...editingJob, workPolicy: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Remote">Remote</option>
+                    <option value="OnSite">OnSite</option>
                   </select>
                 </div>
               </div>
@@ -433,50 +511,50 @@ export default function JobList() {
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Add New Job</h2>
-                <button 
+                <button
                   onClick={() => setShowAddJobModal(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   <X size={20} />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 {/* Job Details Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Job Details</h3>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Job Title*</label>
                       <input
                         type="text"
                         value={newJob.title}
-                        onChange={(e) => setNewJob({...newJob, title: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. Senior Developer"
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Location*</label>
                       <input
                         type="text"
                         value={newJob.location}
-                        onChange={(e) => setNewJob({...newJob, location: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. Remote, Bangalore, etc."
                         required
                       />
                     </div>
                   </div>
-                  
+
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Job Description*</label>
                     <textarea
                       value={newJob.description}
-                      onChange={(e) => setNewJob({...newJob, description: e.target.value})}
+                      onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter detailed job description..."
@@ -487,14 +565,14 @@ export default function JobList() {
                   {/* Skills Section */}
                   <div className="mt-4 space-y-4">
                     <h4 className="text-md font-medium text-gray-900">Required Skills</h4>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Add Skills</label>
                       <div className="flex gap-2">
                         <input
                           type="text"
                           value={newJob.skillInput}
-                          onChange={(e) => setNewJob({...newJob, skillInput: e.target.value})}
+                          onChange={(e) => setNewJob({ ...newJob, skillInput: e.target.value })}
                           onKeyDown={handleSkillInputKeyDown}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                           placeholder="e.g. React, Node.js"
@@ -507,7 +585,7 @@ export default function JobList() {
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
                       {newJob.skills.map((skill, idx) => (
                         <span
@@ -527,13 +605,13 @@ export default function JobList() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Work Policy*</label>
                       <select
                         value={newJob.workPolicy}
-                        onChange={(e) => setNewJob({...newJob, workPolicy: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, workPolicy: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         required
                       >
@@ -542,12 +620,12 @@ export default function JobList() {
                         <option value="Hybrid">Hybrid</option>
                       </select>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                       <select
                         value={newJob.status}
-                        onChange={(e) => setNewJob({...newJob, status: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, status: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="Active">Active</option>
@@ -556,42 +634,42 @@ export default function JobList() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Company Details Section */}
                 <div className="border-b border-gray-200 pb-4">
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Company Details</h3>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Company Name*</label>
                       <input
                         type="text"
                         value={newJob.companyName}
-                        onChange={(e) => setNewJob({...newJob, companyName: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, companyName: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. TechCorp"
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Website*</label>
                       <input
                         type="text"
                         value={newJob.website}
-                        onChange={(e) => setNewJob({...newJob, website: e.target.value})}
+                        onChange={(e) => setNewJob({ ...newJob, website: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. https://techcorp.com"
                         required
                       />
                     </div>
                   </div>
-                  
+
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Company Description*</label>
                     <textarea
                       value={newJob.companyDescription}
-                      onChange={(e) => setNewJob({...newJob, companyDescription: e.target.value})}
+                      onChange={(e) => setNewJob({ ...newJob, companyDescription: e.target.value })}
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Describe the company..."
@@ -599,17 +677,17 @@ export default function JobList() {
                     />
                   </div>
                 </div>
-                
+
                 {/* Salary Section */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Salary Details</h3>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
                       <select
                         value={newJob.salary.currency}
-                        onChange={(e) => setNewJob({...newJob, salary: {...newJob.salary, currency: e.target.value}})}
+                        onChange={(e) => setNewJob({ ...newJob, salary: { ...newJob.salary, currency: e.target.value } })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="INR">INR</option>
@@ -618,13 +696,13 @@ export default function JobList() {
                         <option value="GBP">GBP</option>
                       </select>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Amount*</label>
                       <input
                         type="number"
                         value={newJob.salary.amount}
-                        onChange={(e) => setNewJob({...newJob, salary: {...newJob.salary, amount: e.target.value}})}
+                        onChange={(e) => setNewJob({ ...newJob, salary: { ...newJob.salary, amount: e.target.value } })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. 100000"
                         required
@@ -633,22 +711,21 @@ export default function JobList() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex justify-end space-x-2 mt-6">
-                <button 
-                  onClick={() => setShowAddJobModal(false)} 
+                <button
+                  onClick={() => setShowAddJobModal(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleAddJob}
                   disabled={!newJob.title || !newJob.description || !newJob.companyName || !newJob.location || !newJob.website || !newJob.companyDescription || !newJob.salary.amount}
-                  className={`px-4 py-2 rounded-md ${
-                    !newJob.title || !newJob.description || !newJob.companyName || !newJob.location || !newJob.website || !newJob.companyDescription || !newJob.salary.amount ? 
-                    'bg-blue-300 cursor-not-allowed' : 
+                  className={`px-4 py-2 rounded-md ${!newJob.title || !newJob.description || !newJob.companyName || !newJob.location || !newJob.website || !newJob.companyDescription || !newJob.salary.amount ?
+                    'bg-blue-300 cursor-not-allowed' :
                     'bg-blue-600 hover:bg-blue-700'
-                  } text-white`}
+                    } text-white`}
                 >
                   Add Job
                 </button>
