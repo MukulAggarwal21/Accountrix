@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
 
   BriefcaseBusiness,
@@ -24,15 +24,136 @@ import JobPosting from './JobPosting';
 import AllApplication from './Applications/AllApplication';
 import RecruiterProfile from './Profile/RecruiterProfile';
 import RecruiterBlogDashboard from './Blog/Blog';
+import axios from 'axios';
+// import { response } from 'express';
 
 export default function Dashboard() {
   // const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
+  const [jobs, setJobs] = useState([]);
+  const [change, setChange] = useState(0);
+  const [positive, setPositive] = useState(true);
+
+  const prevJobCountRef = useRef(0); // To keep previous jobs count
+
+
+  // const job = async () => {
+  //   try {
+  //     const response = await axios.get('http://localhost:5000/jobs');
+  //     // setJobs(response.data);
+  //     const currentJobs = response.data;
+
+  //     const prevJobCount = prevJobCountRef.current; // previous count
+  //     const currentJobCount = currentJobs.length; // current count
+
+  //     const jobDifference = currentJobCount - prevJobCount;
+
+  //     // Update change and positive state
+  //     if (jobDifference !== 0) {
+  //       setChange(Math.abs(jobDifference)); // always positive number for display
+  //       setPositive(jobDifference > 0); // true if added, false if removed
+  //     } else {
+  //       setChange(0);
+  //       setPositive(true); // No change considered positive
+  //     }
+
+  //     // Update previous job count
+  //     prevJobCountRef.current = currentJobCount;
+
+  //     // Finally, set jobs
+  //     setJobs(currentJobs);
+
+  //   } catch (error) {
+  //     console.error('Error fetching jobs:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   job(); // Fetch jobs when component mounts
+  // }, []);
+
+
+  //   const job = async () => {
+  //   try {
+  //     const response = await axios.get('http://localhost:5000/jobs');
+  //     const currentJobs = response.data;
+  //     const currentJobCount = currentJobs.length;
+  //     const prevJobCount = prevJobCountRef.current; // Old value
+
+  //     // Compare
+  //     if (prevJobCount !== 0) { // Only compare after first fetch
+  //       const jobDifference = currentJobCount - prevJobCount;
+
+  //       setChange(Math.abs(jobDifference));
+  //       setPositive(jobDifference > 0);
+  //     }
+
+  //     // Set current jobs
+  //     setJobs(currentJobs);
+
+  //     // Update previous count AFTER comparison
+  //     prevJobCountRef.current = currentJobCount;
+
+  //   } catch (error) {
+  //     console.error('Error fetching jobs:', error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   job(); // First fetch
+
+  //   const interval = setInterval(() => {
+  //     job(); // Re-fetch every 5 seconds
+  //   }, 5000);
+
+  //   return () => clearInterval(interval); // Cleanup on unmount
+  // }, []);
+
+  const job = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/jobs');
+      const currentJobs = response.data;
+      const currentJobCount = currentJobs.length;
+      const prevJobCount = prevJobCountRef.current;
+
+      if (prevJobCount !== null) { // Compare only after first fetch
+        const jobDifference = currentJobCount - prevJobCount;
+
+        if (jobDifference !== 0) {
+          setChange(Math.abs(jobDifference));
+          setPositive(jobDifference > 0);
+        }
+        // If no change, do NOT update 'change' or 'positive' state
+      }
+
+      setJobs(currentJobs);
+      prevJobCountRef.current = currentJobCount; // update previous after comparison
+
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  useEffect(() => {
+    job(); // First fetch
+
+    const interval = setInterval(() => {
+      job(); // Re-fetch every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+
 
   // Sample data
   const stats = [
-    { label: 'Active Jobs', value: '24', change: '+3', positive: true },
+    // { label: 'Active Jobs', value: jobs.length, change: '+3', positive: true },
+    // { label: 'Active Jobs', value: jobs.length, change: `+${change}`, positive: positive },
+    // { label: 'Active Jobs', value: jobs.length, change: (positive ? '+' : '-') + change, positive },
+    { label: 'Active Jobs', value: jobs.length, change: (change !== null ? (positive ? '+' : '-') + change : ''), positive },
+
     { label: 'Total Applicants', value: '642', change: '+28', positive: true },
     { label: 'Interviews', value: '38', change: '-5', positive: false },
     { label: 'Hired', value: '12', change: '+2', positive: true },
@@ -74,7 +195,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-       
+
         <div className="flex-1 space-y-1 px-2 py-4">
           <div
             onClick={() => setStep(1)}
@@ -163,8 +284,8 @@ export default function Dashboard() {
         {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
 
         {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
-        {step == 2 && <AllApplication/>}
-        {step == 3 && <InterviewSchedule/>}
+        {step == 2 && <AllApplication />}
+        {step == 3 && <InterviewSchedule />}
         {step == 4 && <ComingSoon />}
 
         {step == 5 && <JobList />}
@@ -172,7 +293,7 @@ export default function Dashboard() {
         {step == 7 && <RecruiterProfile />}
 
 
-        {step == 8 && <JobPosting setStep={setStep} step={step}/>}
+        {step == 8 && <JobPosting setStep={setStep} step={step} />}
       </div>
     </div>
   );

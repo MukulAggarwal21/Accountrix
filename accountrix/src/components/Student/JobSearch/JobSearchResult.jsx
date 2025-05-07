@@ -4,7 +4,6 @@ export default function JobSearchResult() {
     return (
         <>
             <JobCard />
-            <JobCard />
         </>
 
     )

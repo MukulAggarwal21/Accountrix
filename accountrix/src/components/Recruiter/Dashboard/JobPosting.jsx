@@ -24,9 +24,9 @@ export default function JobPosting({ step, setStep }) {
     jobDescription: '',
     companyName: '',
     location: '',
+    employeeCount: '',
     website: '',
     companyDescription: '',
-    // detail: [{ label: '', value: '' }],
     skills: [],
     salary: { currency: 'INR', amount: '' },
     workPolicy: '',
@@ -294,18 +294,39 @@ export default function JobPosting({ step, setStep }) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. New York, NY"
-              value={jobData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
+
+          <div className="flex justify-between gap-4">
+            {/* Location */}
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. New York, NY"
+                value={jobData.location}
+                onChange={(e) => handleInputChange('location', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+
+            {/* Employee Count */}
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Employee Range
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 51-200"
+                value={jobData.employeeCount}
+                onChange={(e) => handleInputChange('employeeCount', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
           </div>
+
+
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
