@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
 import JobSearchInfoPage from "../Student/JobSearch/JobSearchInfoPage";
 import CompanyInfoPage from "../Student/JobSearch/CompanyInfoPage";
-
+import { ToastContainer, toast } from 'react-toastify';
 import axios from "axios";
 import {
   Dialog,
@@ -25,7 +25,7 @@ const JobCard = () => {
   const [isHidden, setIsHidden] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null); // Track the selected job
-
+  const addJob = () => toast.success("Job Saved!");
 
   const options = [
     'Low quality or incomplete data',
@@ -126,12 +126,13 @@ const JobCard = () => {
             {/* Save & Learn More Buttons */}
             <div className="flex space-x-2 mt-4 sm:mt-0">
               <button
-                onClick={() => alert("Saved!")}
+                onClick={addJob}
                 className="border border-gray-300 px-4 py-1 my-1 rounded hover:bg-gray-100 text-sm"
               >
                 Save
               </button>
 
+              <ToastContainer  />
 
               <button
 
@@ -180,7 +181,7 @@ const JobCard = () => {
                 </button>
 
 
-                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index}/> : <CompanyInfoPage />}
+                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index} /> : <CompanyInfoPage />}
               </div>
             </div>
           )}

@@ -3,6 +3,16 @@ import React from "react";
 import brandHiringImage from '../../../assets/images/brandhiring.png';
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Navbar";
+import HeroSection from "../../HeroSection/HeroSection";
+import Features from "../../Features/Features";
+import Whatweoffer from "../../offering/whatweoffer";
+import Testimonials from "../../Testimonials/Testimonials";
+import Statistics from "../../Statistics/Statistics";
+import Newsletter from "../../Subscription/Subscription";
+
+import FAQSection from "@/components/FAQ/faqQuestion";
+import Footer from "../../Footer/footer";
+
 export default function BrandHiring() {
   const navigate = useNavigate();
   return (
@@ -61,6 +71,16 @@ export default function BrandHiring() {
           </div>
         </div>
       </div>
+       <HeroSection />
+
+            <Features />
+            <Whatweoffer />
+            <Testimonials />
+            <Statistics />
+
+            <Newsletter />
+            <FAQSection />
+            <Footer />
     </>
 
   );
