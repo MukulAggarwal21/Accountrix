@@ -1,36 +1,35 @@
+import React from 'react';
+import { useState } from 'react';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Import default styles
 
-
-import React from 'react'
-import { useState } from 'react'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 export default function LoginRegister({ setIsAuthenticated }) {
-    const navigate = useNavigate()
-    const [showPassword, setShowPassword] = useState(false)
-    const [activeTab, setActiveTab] = useState('login') // 'login' or 'register'
+    const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: '',
         role: ''
-    })
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
+    });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
-        })
-    }
+        });
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        setError('')
+        e.preventDefault();
+        setLoading(true);
 
         try {
-            const endpoint = activeTab === 'login' ? '/user/login' : '/user/register'
+            const endpoint = activeTab === 'login' ? '/user/login' : '/user/register';
             const response = await fetch(`http://localhost:5000${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -38,20 +37,17 @@ export default function LoginRegister({ setIsAuthenticated }) {
                 },
                 body: JSON.stringify(formData),
                 credentials: 'include'
-            })
+            });
 
-            const data = await response.json()
+            const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong')
+                throw new Error(data.message || 'Something went wrong');
             }
 
-
             // Handle successful response
-            console.log('Success:', data)
-            // window.location.href = '/brandhiring' // Redirect to homepage
+            console.log('Success:', data);
             setIsAuthenticated(true); // Update authentication state
-
 
             if (activeTab === 'login') {
                 if (formData.role === 'recruiter') {
@@ -59,28 +55,41 @@ export default function LoginRegister({ setIsAuthenticated }) {
                 } else if (formData.role === 'student') {
                     navigate('/brandhiring');
                 }
-            }
-            else if (activeTab === 'register') {
+            } else if (activeTab === 'register') {
                 if (formData.role === 'recruiter') {
                     navigate('/recruitersetup');
-                }
-                else if (formData.role === 'student') {
+                } else if (formData.role === 'student') {
                     navigate('/brandhiring');
                 }
             }
-
         } catch (err) {
-            setError(err.message)
-            console.error('Error:', err)
+            // Show error as a toast notification
+            toast.error(err.message, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                // style: {"margin-top": "60px"},
+                // className:'lg:mt-20'
+            });
+            console.error('Error:', err);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="bg-white rounded-2xl w-full max-w-md shadow-lg p-6 mt-10 lg:mt-0">
+            {/* Toast Container */}
+
             {/* Tabs */}
             <div className="flex border-b border-gray-200">
+                        <ToastContainer />
+
                 <button
                     className={`flex-1 py-4 font-medium relative ${activeTab === 'register' ? 'text-blue-700' : 'text-gray-500'}`}
                     onClick={() => setActiveTab('register')}
@@ -102,12 +111,6 @@ export default function LoginRegister({ setIsAuthenticated }) {
                     )}
                 </button>
             </div>
-
-            {error && (
-                <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                    {error}
-                </div>
-            )}
 
             {/* Login Form */}
             {activeTab === 'login' && (
@@ -224,5 +227,5 @@ export default function LoginRegister({ setIsAuthenticated }) {
                 </form>
             )}
         </div>
-    )
+    );
 }
