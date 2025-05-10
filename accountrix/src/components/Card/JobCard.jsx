@@ -180,7 +180,7 @@ const JobCard = () => {
                 </button>
 
 
-                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} /> : <CompanyInfoPage />}
+                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index}/> : <CompanyInfoPage />}
               </div>
             </div>
           )}
