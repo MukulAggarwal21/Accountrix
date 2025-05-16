@@ -13,11 +13,27 @@ export default function JobList() {
   const [editingJob, setEditingJob] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showAddJobModal, setShowAddJobModal] = useState(false);
+  // const [newJob, setNewJob] = useState({
+  //   title: '',
+  //   description: '',
+  //   companyName: '',
+  //   location: '',
+  //   website: '',
+  //   companyDescription: '',
+  //   skills: [],
+  //   skillInput: '',
+  //   workPolicy: 'On-site', // Default value
+  //   salary: {
+  //     currency: 'INR',
+  //     amount: '',
+  //   },
+  //   status: 'Active',
+  // });
   const [newJob, setNewJob] = useState({
-    title: '',
-    description: '',
+    jobTitle: '',
+    jobDescription: '',
     companyName: '',
-    location: '',
+    companyLocation: '',
     website: '',
     companyDescription: '',
     skills: [],
@@ -30,18 +46,6 @@ export default function JobList() {
     status: 'Active',
   });
 
-  // useEffect(() => {
-  //   const fetchJobs = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:5000/jobs'); // Replace with your API endpoint
-  //       setJobs(response.data); // Assuming the API returns an array of jobs
-  //     } catch (error) {
-  //       console.error('Error fetching jobs:', error);
-  //     }
-  //   };
-
-  //   fetchJobs();
-  // }, []);
 
 
   useEffect(() => {
@@ -55,15 +59,14 @@ export default function JobList() {
     };
 
     fetchJobs();
-  }, [jobs]);
-
+  }, []);
 
 
   // Filter jobs based on search term
   const filteredJobs = jobs.filter(job =>
-    job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.location?.toLowerCase().includes(searchTerm.toLowerCase())
+    job.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.jobDescription?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.jobLocation?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleView = (job) => {
@@ -131,10 +134,10 @@ export default function JobList() {
       setJobs([response.data, ...jobs]);
       setShowAddJobModal(false);
       setNewJob({
-        title: '',
-        description: '',
+        jobTitle: '',
+        jobDescription: '',
         companyName: '',
-        location: '',
+        jobLocation: '',
         website: '',
         companyDescription: '',
         skills: [],
@@ -277,7 +280,7 @@ export default function JobList() {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{viewingJob.location}</span>
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{viewingJob.jobLocation}</span>
                 <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
                   {viewingJob.salary?.currency || ''} {viewingJob.salary?.amount || viewingJob.salary || ''}
                 </span>
