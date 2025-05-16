@@ -20,6 +20,7 @@ import AllApplication from './components/Recruiter/Dashboard/Applications/AllApp
 import RecruiterProfile from './components/Recruiter/Dashboard/Profile/RecruiterProfile';
 import BlogPage from './components/Recruiter/Dashboard/Blog/Blog';
 import NotificationPage from './components/Recruiter/Dashboard/Notification/Notification';
+import CompanyCultureForm from './components/Recruiter/SignupInfo/components/CompanyCultureForm';
 function App() {
 
   return (
@@ -43,6 +44,8 @@ function App() {
         <Route path="/allapplication" element={<AllApplication />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/notification" element={<NotificationPage />} />
+                <Route path="/company" element={<CompanyCultureForm />} />
+
       </Routes>
 
     </Router>

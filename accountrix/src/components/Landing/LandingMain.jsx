@@ -20,7 +20,7 @@ export default function LandingMain({ setIsAuthenticated , setUserType}) {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xl">💡</span>
-            <span> Skip the crowd. Discover the right fit faster.</span>
+            <span> Skip the crowd. Discover the right fit faster.</span> 
           </div>
         </div>
         <button className="bg-blue-600 text-white rounded px-6 py-3 font-medium w-fit hover:bg-blue-700 transition-colors">

@@ -85,7 +85,7 @@ const JobCard = () => {
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 mt-1">AI employee for Amazon sellers</p>
+                <p className="text-sm text-gray-600 mt-1">AI employee for {job.companyName} sellers</p>
                 <p className="text-sm text-gray-500 italic"> {job.employeeCount}  Employees</p>
               </div>
             </div>

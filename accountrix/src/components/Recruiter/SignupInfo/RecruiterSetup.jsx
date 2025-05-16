@@ -11,7 +11,10 @@ import {
   CloudArrowUpIcon,
   TrashIcon,
   PlusCircleIcon,
-  CheckIcon
+  CheckIcon,
+  CurrencyDollarIcon,
+  HeartIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import CompanyInfoForm from './components/CompanyInfoForm';
 import ProgressBar from './components/ProgressBar';
@@ -20,6 +23,8 @@ import PersonalInfoForm from './components/PersonalInfoForm';
 import CompanyBranding from './components/CompanyBranding';
 import CompletionStep from './components/CompletionStep';
 import TeamSetupForm from './components/TeamSetupForm';
+import FundingForm from './components/FundingForm';
+import CompanyCultureForm from './components/CompanyCultureForm';
 
 const RecruiterSetup = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -48,7 +53,22 @@ const RecruiterSetup = () => {
     companyColors: {
       primary: '#3b82f6',
       secondary: '#ffffff'
-    }
+    },
+    // Funding info
+    totalRounds: '',
+    lastRoundDate: '',
+    investors: [{ name: '', company: '', location: '' }],
+    // Company Culture info
+    cultureValues: [],
+    marketValues: [],
+    cultureDescription: '',
+    linkedin: '',
+    twitter: '',
+    facebook: '',
+    instagram: '',
+    benefit1: '',
+    benefit2: '',
+    benefit3: ''
   });
 
   const handleInputChange = (e) => {
@@ -89,8 +109,31 @@ const RecruiterSetup = () => {
     }
   };
 
+  const handleInvestorChange = (index, field, value) => {
+    const updatedInvestors = [...formData.investors];
+    updatedInvestors[index] = {
+      ...updatedInvestors[index],
+      [field]: value,
+    };
+    setFormData({ ...formData, investors: updatedInvestors });
+  };
+
+  const addInvestor = () => {
+    setFormData({
+      ...formData,
+      investors: [...formData.investors, { name: '', company: '', location: '' }],
+    });
+  };
+
+  const removeInvestor = (index) => {
+    if (formData.investors.length > 1) {
+      const updatedInvestors = formData.investors.filter((_, i) => i !== index);
+      setFormData({ ...formData, investors: updatedInvestors });
+    }
+  };
+
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
@@ -107,7 +150,7 @@ const RecruiterSetup = () => {
     e.preventDefault();
     // Submit form data to backend
     console.log('Form submitted:', formData);
-    nextStep();
+    setCurrentStep(5); // Move to completion step
   };
 
   return (
@@ -124,7 +167,7 @@ const RecruiterSetup = () => {
 
 
         {/* Progress Steps */}
-        <ProgressBar currentStep={currentStep} />
+        <ProgressBar currentStep={currentStep} totalSteps={5} />
 
 
         {/* Form Card Container */}
@@ -145,11 +188,8 @@ const RecruiterSetup = () => {
                 {/* Company Information */}
                 <CompanyInfoForm formData={formData} handleInputChange={handleInputChange} handleFileUpload={handleFileUpload} />
 
-
                 {/* Personal Information & Additional Options */}
                 <PersonalInfoForm formData={formData} handleInputChange={handleInputChange} handleFileUpload={handleFileUpload} setFormData={setFormData} />
-
-
               </div>
 
               <div className="flex justify-end mt-10">
@@ -173,15 +213,12 @@ const RecruiterSetup = () => {
               transition={{ duration: 0.5 }}
               className="p-8"
             >
-
               <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Team Members Setup</h2>
 
               <TeamSetupForm formData={formData} handleTeamMemberChange={handleTeamMemberChange} addTeamMember={addTeamMember} removeTeamMember={removeTeamMember} />
 
-
               {/* Company Branding */}
               <CompanyBranding formData={formData} setFormData={setFormData} />
-
 
               {/* Action Buttons */}
               <div className="flex justify-between mt-8">
@@ -196,6 +233,82 @@ const RecruiterSetup = () => {
 
                 <button
                   type="button"
+                  onClick={nextStep}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 flex items-center"
+                >
+                  Continue to Culture
+                  <ArrowRightIcon className="ml-2 h-5 w-5" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Page 3: Company Culture */}
+          {currentStep === 3 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="p-8"
+            >
+              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Company Culture</h2>
+
+              <CompanyCultureForm formData={formData} handleInputChange={handleInputChange} setFormData={setFormData} />
+
+              {/* Action Buttons */}
+              <div className="flex justify-between mt-8">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-200 flex items-center"
+                >
+                  <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                  Back to Team Setup
+                </button>
+
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 flex items-center"
+                >
+                  Continue to Funding
+                  <ArrowRightIcon className="ml-2 h-5 w-5" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Page 4: Funding Information */}
+          {currentStep === 4 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="p-8"
+            >
+              <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Funding Information</h2>
+
+              <FundingForm 
+                formData={formData} 
+                handleInputChange={handleInputChange} 
+                handleInvestorChange={handleInvestorChange} 
+                addInvestor={addInvestor} 
+                removeInvestor={removeInvestor} 
+              />
+
+              {/* Action Buttons */}
+              <div className="flex justify-between mt-8">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-200 flex items-center"
+                >
+                  <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                  Back to Culture
+                </button>
+
+                <button
+                  type="button"
                   onClick={handleSubmit}
                   className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md transition-all duration-300 flex items-center"
                 >
@@ -206,9 +319,8 @@ const RecruiterSetup = () => {
             </motion.div>
           )}
 
-
-          {/* Page 3: Completion */}
-          {currentStep === 3 && (
+          {/* Page 5: Completion */}
+          {currentStep === 5 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -216,7 +328,6 @@ const RecruiterSetup = () => {
               className="p-8 text-center"
             >
               <CompletionStep />
-
             </motion.div>
           )}
         </div>
@@ -229,8 +340,3 @@ const RecruiterSetup = () => {
 };
 
 export default RecruiterSetup;
-
-
-
-
-
