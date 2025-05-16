@@ -4,7 +4,7 @@ import { HeartIcon, GlobeAltIcon, LinkIcon, PlusCircleIcon, XMarkIcon } from '@h
 const CompanyCultureForm = ({ formData, handleInputChange, setFormData }) => {
   const [newCultureOption, setNewCultureOption] = useState('');
   const [newMarketOption, setNewMarketOption] = useState('');
-  
+
   // Culture options preset
   const cultureOptions = [
     'Remote-friendly', 'Flexible Hours', 'Healthcare', 'Mental Health Support',
