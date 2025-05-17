@@ -14,7 +14,7 @@ import {
   CheckIcon,
   CurrencyDollarIcon,
   HeartIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import CompanyInfoForm from './components/CompanyInfoForm';
 import ProgressBar from './components/ProgressBar';
@@ -146,12 +146,50 @@ const RecruiterSetup = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Submit form data to backend
+  //   console.log('Form submitted:', formData);
+  //   setCurrentStep(5); // Move to completion step
+  // };
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Submit form data to backend
-    console.log('Form submitted:', formData);
-    setCurrentStep(5); // Move to completion step
+
+    // Get recruiterId from localStorage (set this after recruiter signup/login)
+    const recruiterId = localStorage.getItem('recruiterId');
+    if (!recruiterId) {
+      alert("Recruiter ID not found. Please login again.");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/company/onboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recruiterId, ...formData }),
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success logic: show a message, move to completion step, etc.
+        console.log('Company onboarded:', data);
+        setCurrentStep(5); // Move to completion step
+      } else {
+        // Error logic: show error message
+        alert(data.message || "Failed to onboard company.");
+      }
+    } catch (err) {
+      // Handle network or other errors
+      console.error('Error submitting company onboarding:', err);
+      alert("An error occurred while submitting the form.");
+    }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -288,12 +326,12 @@ const RecruiterSetup = () => {
             >
               <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Funding Information</h2>
 
-              <FundingForm 
-                formData={formData} 
-                handleInputChange={handleInputChange} 
-                handleInvestorChange={handleInvestorChange} 
-                addInvestor={addInvestor} 
-                removeInvestor={removeInvestor} 
+              <FundingForm
+                formData={formData}
+                handleInputChange={handleInputChange}
+                handleInvestorChange={handleInvestorChange}
+                addInvestor={addInvestor}
+                removeInvestor={removeInvestor}
               />
 
               {/* Action Buttons */}

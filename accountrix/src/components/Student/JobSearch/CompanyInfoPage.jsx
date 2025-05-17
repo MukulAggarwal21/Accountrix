@@ -5,7 +5,7 @@ import {
   FaLinkedin,
   FaShareAlt,FaHeartbeat, FaDumbbell, FaHome, FaStar ,FaSeedling 
 } from "react-icons/fa";
-const CompanyInfoPage = () => {
+const CompanyInfoPage = ({job}) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const jobs = [
@@ -48,11 +48,10 @@ const CompanyInfoPage = () => {
         return (
           <>
             <div>
-              <h2 className="text-xl font-bold mb-2">Superfuel AI careers</h2>
+              <h2 className="text-xl font-bold mb-2">{job.companyName}</h2>
               <h3 className="text-lg font-semibold mb-2">AI employee for Amazon sellers</h3>
               <p className="text-gray-700 text-sm leading-6">
-                Superfuel is an AI employee for Amazon sellers. It handles day-to-day tasks with human-like reasoning, interaction and execution. Try out its tasks like Reduce Wasteful Ad Spends, Improve Organic Rank etc. We're backed by Accel (early investors in Spotify, Dropbox, Facebook).
-              </p>
+               {job.jobDescription}    </p>
             </div>
 
             {/* Jobs Link */}
@@ -373,9 +372,9 @@ const CompanyInfoPage = () => {
                 <span className="text-white font-bold text-xl">⚡</span>
               </div>
               <div>
-                <h1 className="font-semibold text-xl">Superfuel AI <span className="text-green-600">• Actively Hiring</span></h1>
-                <p className="text-gray-600 text-sm">AI employee for Amazon sellers</p>
-                <p className="text-gray-500 text-xs">1-10 Employees</p>
+                <h1 className="font-semibold text-xl">{job.companyName} <span className="text-green-600">• Actively Hiring</span></h1>
+                <p className="text-gray-600 text-sm">AI employee for {job.companyName} sellers</p>
+                <p className="text-gray-500 text-xs">{job.employeeCount} Employees</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -404,14 +403,14 @@ const CompanyInfoPage = () => {
 
         {/* Right Section */}
         <div className="w-full lg:w-80 border rounded-md p-4 shadow-sm">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">ABOUT SUPERFUEL AI</h4>
+          <h4 className="text-sm font-bold text-gray-700 mb-2">ABOUT {job.companyName}</h4>
           <p>Website</p>
           <div className="text-sm text-blue-600 underline mb-4">
 
-            <a href="https://superfuel.io" target="_blank" rel="noreferrer">superfuel.io</a>
+            <a href="https://superfuel.io" target="_blank" rel="noreferrer">{job.website}</a>
           </div>
-          <div className="text-sm text-gray-600 mb-4">📍<span className="text-blue-600 underline">Bengaluru</span></div>
-          <div className="text-sm text-gray-700 mb-1">Company size: <span className="text-black">1-10 people</span></div>
+          <div className="text-sm text-gray-600 mb-4">📍<span className="text-blue-600 underline">{job.jobLocation}</span></div>
+          <div className="text-sm text-gray-700 mb-1">Company size: <span className="text-black">{job.employeeCount} people</span></div>
           <div className="text-sm text-gray-700 mb-4">Company type: <span className="text-black">SaaS</span></div>
 
           <div>

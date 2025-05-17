@@ -41,6 +41,29 @@ export default function LoginRegister({ setIsAuthenticated }) {
 
             const data = await response.json();
 
+            // if (!response.ok) {
+            //     throw new Error(data.message || 'Something went wrong');
+            // }
+
+            // // Handle successful response
+            // console.log('Success:', data);
+            // setIsAuthenticated(true); // Update authentication state
+
+            // if (activeTab === 'login') {
+            //     if (formData.role === 'recruiter') {
+            //         navigate('/dashboard');
+            //     } else if (formData.role === 'student') {
+            //         navigate('/brandhiring');
+            //     }
+            // } else if (activeTab === 'register') {
+            //     if (formData.role === 'recruiter') {
+            //         navigate('/recruitersetup');
+            //     } else if (formData.role === 'student') {
+            //         navigate('/brandhiring');
+            //     }
+            // }
+
+
             if (!response.ok) {
                 throw new Error(data.message || 'Something went wrong');
             }
@@ -49,6 +72,14 @@ export default function LoginRegister({ setIsAuthenticated }) {
             console.log('Success:', data);
             setIsAuthenticated(true); // Update authentication state
 
+            // Save recruiterId to localStorage if recruiter
+            // if (formData.role === 'recruiter' && data.user && data.user._id) {
+            //     localStorage.setItem('recruiterId', data.user._id);
+            // }
+            if (formData.role === 'recruiter' && data.user && (data.user._id || data.user.id)) {
+                localStorage.setItem('recruiterId', data.user._id || data.user.id);
+            }
+            // Navigation logic
             if (activeTab === 'login') {
                 if (formData.role === 'recruiter') {
                     navigate('/dashboard');
@@ -62,6 +93,8 @@ export default function LoginRegister({ setIsAuthenticated }) {
                     navigate('/brandhiring');
                 }
             }
+
+
         } catch (err) {
             // Show error as a toast notification
             toast.error(err.message, {
@@ -88,7 +121,7 @@ export default function LoginRegister({ setIsAuthenticated }) {
 
             {/* Tabs */}
             <div className="flex border-b border-gray-200">
-                        <ToastContainer />
+                <ToastContainer />
 
                 <button
                     className={`flex-1 py-4 font-medium relative ${activeTab === 'register' ? 'text-blue-700' : 'text-gray-500'}`}
