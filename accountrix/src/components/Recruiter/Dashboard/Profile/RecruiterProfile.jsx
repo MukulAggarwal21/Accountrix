@@ -1,10 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { User, Building, Mail, Globe, MapPin, Users, Award, Phone, Edit, Clock, Calendar, Briefcase, Check } from 'lucide-react';
 import ProfileStatsCard from './ProfileStatsCard';
 import MainContent from './MainContent';
 
-export default function RecruiterProfile() {
+export default function RecruiterProfile({ companyId, recruiterId }) {
   const [activeTab, setActiveTab] = useState('profile');
+
+ const [companyData, setCompanyData] = useState(null);
+
+  useEffect(() => {
+    if (!companyId) return;
+    axios.get(`http://localhost:5000/company/${companyId}`)
+      .then(res => setCompanyData(res.data))
+      .catch(err => console.error('Error fetching company:', err));
+  }, [companyId]);
+
+  if (!companyData) {
+    return <div>Loading...</div>;
+  }
+
 
   // Sample data - in a real app this would come from API/props
   const profileData = {
@@ -48,19 +63,19 @@ export default function RecruiterProfile() {
         <div className="bg-white rounded-xl shadow overflow-hidden mb-6">
           <div
             className="h-32 w-full"
-            style={{ backgroundColor: profileData.colors.primary }}
+            style={{ backgroundColor: companyData.companyColors.primary }}
           />
           <div className="px-6 py-4 flex flex-col md:flex-row items-start md:items-end relative">
             <div className="absolute -top-16 left-6 md:relative md:-mt-16 md:left-0">
               <div className="h-32 w-32 rounded-xl bg-white p-1 shadow-lg">
                 <div className="h-full w-full rounded-lg bg-blue-100 flex items-center justify-center">
-                  <span className="text-5xl font-bold text-blue-600">{profileData.company.charAt(0)}</span>
+                  <span className="text-5xl font-bold text-blue-600">{companyData.companyName.charAt(0).toUpperCase()}</span>
                 </div>
               </div>
             </div>
             <div className="mt-20 md:mt-0 md:ml-6 flex-grow">
-              <h1 className="text-2xl font-bold text-gray-900">{profileData.company}</h1>
-              <p className="text-gray-600">{profileData.pitch}</p>
+              <h1 className="text-2xl font-bold text-gray-900">{companyData.companyName}</h1>
+              <p className="text-gray-600">{companyData.pitch}</p>
             </div>
             <div className="mt-4 md:mt-0">
               <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -74,8 +89,8 @@ export default function RecruiterProfile() {
               <button
                 onClick={() => setActiveTab('profile')}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'profile'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 Profile
@@ -83,8 +98,8 @@ export default function RecruiterProfile() {
               <button
                 onClick={() => setActiveTab('team')}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'team'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 Team
@@ -92,8 +107,8 @@ export default function RecruiterProfile() {
               <button
                 onClick={() => setActiveTab('activity')}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'activity'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 Activity
@@ -101,8 +116,8 @@ export default function RecruiterProfile() {
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${activeTab === 'settings'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 Settings
@@ -113,11 +128,11 @@ export default function RecruiterProfile() {
 
         {/* Profile Stats Cards */}
 
-        <ProfileStatsCard profileData={profileData} />
+        <ProfileStatsCard profileData={profileData} companyId={companyId} recruiterId={recruiterId} />
 
         {/* Main Content Area */}
         {activeTab === 'profile' && (
-          <MainContent profileData={profileData} />
+          <MainContent profileData={profileData} companyData={companyData} />
         )}
         {/* Team Tab */}
         {activeTab === 'team' && (

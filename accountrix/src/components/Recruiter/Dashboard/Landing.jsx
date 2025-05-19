@@ -37,6 +37,7 @@ export default function Dashboard() {
 
   const [company, setCompany] = useState(null);
   const companyId = localStorage.getItem('companyId');
+  const recruiterId = localStorage.getItem('recruiterId');
 
 
   // useEffect(() => {
@@ -148,7 +149,7 @@ useEffect(() => {
 
   const job = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/jobs');
+      const response = await axios.get(`http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`);
       const currentJobs = response.data;
       const currentJobCount = currentJobs.length;
       const prevJobCount = prevJobCountRef.current;
@@ -329,7 +330,7 @@ useEffect(() => {
         {step == 5 && <JobList companyId={companyId} />}
 
         {step == 6 && <RecruiterBlogDashboard />}
-        {step == 7 && <RecruiterProfile />}
+        {step == 7 && <RecruiterProfile  companyId={companyId} recruiterId={recruiterId}/>}
 
 
         {step == 8 && <JobPosting setStep={setStep} step={step} />}

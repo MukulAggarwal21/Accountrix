@@ -1,14 +1,41 @@
 import React from 'react'
+import axios from 'axios';
+import { useEffect,useRef ,useState } from 'react';
 import {  Users, Award,  Briefcase } from 'lucide-react';
 
-export default function ProfileStatsCard({profileData}) {
+export default function ProfileStatsCard({profileData , companyId , recruiterId}) {
+  const [jobs, setJobs] = useState([]);
+
+   const job = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`);
+      const currentJobs = response.data;
+
+      setJobs(currentJobs);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  useEffect(() => {
+    job(); // First fetch
+
+    const interval = setInterval(() => {
+      job(); // Re-fetch every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+
+
   return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white rounded-xl shadow p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Jobs</p>
-                <p className="text-3xl font-bold">{profileData.activeJobs}</p>
+                <p className="text-3xl font-bold">{jobs.length}</p>
               </div>
               <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
                 <Briefcase size={24} className="text-blue-600" />
