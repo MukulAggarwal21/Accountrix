@@ -1,44 +1,61 @@
 
-import React , {useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FaTwitter,
   FaLinkedin,
-  FaShareAlt,FaHeartbeat, FaDumbbell, FaHome, FaStar ,FaSeedling 
+  FaShareAlt, FaHeartbeat, FaDumbbell, FaHome, FaStar, FaSeedling
 } from "react-icons/fa";
-const CompanyInfoPage = ({job}) => {
+const CompanyInfoPage = ({ job }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [jobs, setJobs] = useState([]);
+  const [company, setCompany] = useState({});
 
-  const jobs = [
-    {
-      title: 'AI Engineer',
-      location: 'Remote only • Bangalore Urban',
-      posted: '14 days ago',
-      salary: '₹18L – ₹20L',
-      showActions: true,
-    },
-    {
-      title: 'Product Engineer',
-      location: 'Remote only • Bengaluru',
-      posted: '',
-      salary: '₹17L – ₹25L',
-      showActions: false,
-    },
-    {
-      title: 'AI Engineer',
-      location: 'Remote only • Bangalore Urban',
-      posted: '14 days ago',
-      salary: '₹18L – ₹20L',
-      showActions: true,
-    },
-    {
-      title: 'AI Engineer',
-      location: 'Remote only • Bangalore Urban',
-      posted: '14 days ago',
-      salary: '₹18L – ₹20L',
-      showActions: true,
-    },
-    
-  ];
+  const companyId = job.company; // This should be the ObjectId
+
+  useEffect(() => {
+    async function fetchCompanyAndJobs() {
+      const companyRes = await fetch(`http://localhost:5000/company/${companyId}`);
+      const company = await companyRes.json();
+      setCompany(company);
+
+      const jobsRes = await fetch(`http://localhost:5000/jobs/byCompany/${companyId}`);
+      const jobs = await jobsRes.json();
+      setJobs(jobs);
+    }
+    fetchCompanyAndJobs();
+  }, [companyId]);
+
+  // const jobs = [
+  //   {
+  //     title: 'AI Engineer',
+  //     location: 'Remote only • Bangalore Urban',
+  //     posted: '14 days ago',
+  //     salary: '₹18L – ₹20L',
+  //     showActions: true,
+  //   },
+  //   {
+  //     title: 'Product Engineer',
+  //     location: 'Remote only • Bengaluru',
+  //     posted: '',
+  //     salary: '₹17L – ₹25L',
+  //     showActions: false,
+  //   },
+  //   {
+  //     title: 'AI Engineer',
+  //     location: 'Remote only • Bangalore Urban',
+  //     posted: '14 days ago',
+  //     salary: '₹18L – ₹20L',
+  //     showActions: true,
+  //   },
+  //   {
+  //     title: 'AI Engineer',
+  //     location: 'Remote only • Bangalore Urban',
+  //     posted: '14 days ago',
+  //     salary: '₹18L – ₹20L',
+  //     showActions: true,
+  //   },
+
+  // ];
 
 
 
@@ -51,7 +68,7 @@ const CompanyInfoPage = ({job}) => {
               <h2 className="text-xl font-bold mb-2">{job.companyName}</h2>
               <h3 className="text-lg font-semibold mb-2">AI employee for Amazon sellers</h3>
               <p className="text-gray-700 text-sm leading-6">
-               {job.jobDescription}    </p>
+                {job.jobDescription}    </p>
             </div>
 
             {/* Jobs Link */}
@@ -147,196 +164,196 @@ const CompanyInfoPage = ({job}) => {
       case 'people':
         return (
           <div className="p-6 w-full max-w-md text-gray-800">
-      <h2 className="text-xl font-semibold mb-1">People at Superfuel AI</h2>
-      <h3 className="text-lg font-semibold mb-4">Founders</h3>
+            <h2 className="text-xl font-semibold mb-1">People at Superfuel AI</h2>
+            <h3 className="text-lg font-semibold mb-4">Founders</h3>
 
-      <div className="border rounded-lg overflow-hidden shadow-sm">
-        {/* Top Section */}
-        <div className="flex justify-between items-center p-4">
-          <div>
-            <h4 className="text-lg font-semibold">Emil Soman</h4>
-            <p className="text-sm text-gray-600">Co-Founder & CTO</p>
-            <p className="text-sm text-gray-500">Bengaluru</p>
-            <p className="text-sm text-gray-700 mt-2">
-              Founder at <span className="text-blue-700">Dockup (YC W19)</span>
-            </p>
-          </div>
-          <img
-            src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180"// Replace with actual image URL or local image
-            alt="Emil Soman"
-            className="w-14 h-14 rounded-full object-cover"
-          />
-        </div>
+            <div className="border rounded-lg overflow-hidden shadow-sm">
+              {/* Top Section */}
+              <div className="flex justify-between items-center p-4">
+                <div>
+                  <h4 className="text-lg font-semibold">Emil Soman</h4>
+                  <p className="text-sm text-gray-600">Co-Founder & CTO</p>
+                  <p className="text-sm text-gray-500">Bengaluru</p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    Founder at <span className="text-blue-700">Dockup (YC W19)</span>
+                  </p>
+                </div>
+                <img
+                  src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180"// Replace with actual image URL or local image
+                  alt="Emil Soman"
+                  className="w-14 h-14 rounded-full object-cover"
+                />
+              </div>
 
-        {/* Background Section */}
-        <div className="bg-indigo-50 p-4">
-          <p className="uppercase text-xs text-gray-500 font-semibold mb-2">
-            Background
-          </p>
+              {/* Background Section */}
+              <div className="bg-indigo-50 p-4">
+                <p className="uppercase text-xs text-gray-500 font-semibold mb-2">
+                  Background
+                </p>
 
-          {/* Entries */}
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <p className="font-semibold">Dockup</p>
-              <p className="text-sm text-gray-600">Founder</p>
+                {/* Entries */}
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <p className="font-semibold">Dockup</p>
+                    <p className="text-sm text-gray-600">Founder</p>
+                  </div>
+                  <img
+                    src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Dockup logo
+                    alt="Dockup"
+                    className="w-6 h-6"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <p className="font-semibold">Brb</p>
+                    <p className="text-sm text-gray-600">Founder</p>
+                  </div>
+                  <img
+                    src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Brb logo
+                    alt="Brb"
+                    className="w-6 h-6"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold">Codemancers</p>
+                    <p className="text-sm text-gray-600">Director</p>
+                  </div>
+                  <img
+                    src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Codemancers logo
+                    alt="Codemancers"
+                    className="w-6 h-6"
+                  />
+                </div>
+              </div>
             </div>
-            <img
-              src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Dockup logo
-              alt="Dockup"
-              className="w-6 h-6"
-            />
           </div>
-
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <p className="font-semibold">Brb</p>
-              <p className="text-sm text-gray-600">Founder</p>
-            </div>
-            <img
-              src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Brb logo
-              alt="Brb"
-              className="w-6 h-6"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="font-semibold">Codemancers</p>
-              <p className="text-sm text-gray-600">Director</p>
-            </div>
-            <img
-              src="https://tse3.mm.bing.net/th?id=OIP.5SvTNEacBHqDax8KkGovBQHaHa&pid=Api&P=0&h=180" // Codemancers logo
-              alt="Codemancers"
-              className="w-6 h-6"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
         );
       case 'culture':
         return (
           <>
-             <div>
-            <h2 className="text-xl font-bold mb-2">Culture & Benefits</h2>
-            <p className="text-gray-700 text-sm leading-6">We believe in remote-first flexibility, wellness support, and flat hierarchies. From flexible hours to wellness reimbursements, we care about your well-being as much as your output.</p>
-          </div>
-          <div className="p-6 max-w-4xl mx-auto text-gray-800">
-      <h2 className="text-2xl font-semibold mb-4">Culture and benefits at Superfuel AI</h2>
+            <div>
+              <h2 className="text-xl font-bold mb-2">Culture & Benefits</h2>
+              <p className="text-gray-700 text-sm leading-6">We believe in remote-first flexibility, wellness support, and flat hierarchies. From flexible hours to wellness reimbursements, we care about your well-being as much as your output.</p>
+            </div>
+            <div className="p-6 max-w-4xl mx-auto text-gray-800">
+              <h2 className="text-2xl font-semibold mb-4">Culture and benefits at Superfuel AI</h2>
 
-      {/* Remote Policy Section */}
-      <div className="flex flex-wrap justify-between mb-8">
-        <div className="mb-4">
-          <h3 className="text-md font-semibold mb-1">Remote policy</h3>
-          <p className="text-sm text-gray-600 mb-1">Locations</p>
-          <span className="px-3 py-1 rounded-full border text-sm text-gray-700">
-            Bengaluru
-          </span>
-        </div>
-        <div className="mb-4">
-          <h3 className="text-md font-semibold mb-1">Remote policy</h3>
-          <span className="px-3 py-1 rounded-full border text-sm text-gray-700">
-            Remote only
-          </span>
-        </div>
-      </div>
+              {/* Remote Policy Section */}
+              <div className="flex flex-wrap justify-between mb-8">
+                <div className="mb-4">
+                  <h3 className="text-md font-semibold mb-1">Remote policy</h3>
+                  <p className="text-sm text-gray-600 mb-1">Locations</p>
+                  <span className="px-3 py-1 rounded-full border text-sm text-gray-700">
+                    Bengaluru
+                  </span>
+                </div>
+                <div className="mb-4">
+                  <h3 className="text-md font-semibold mb-1">Remote policy</h3>
+                  <span className="px-3 py-1 rounded-full border text-sm text-gray-700">
+                    Remote only
+                  </span>
+                </div>
+              </div>
 
-      {/* Perks and Benefits Section */}
-      <h3 className="text-lg font-semibold mb-4">Perks and benefits</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Item */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
-            <FaHeartbeat />
-          </div>
-          <p>Healthcare benefits</p>
-        </div>
+              {/* Perks and Benefits Section */}
+              <h3 className="text-lg font-semibold mb-4">Perks and benefits</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Item */}
+                <div className="flex items-center gap-3">
+                  <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
+                    <FaHeartbeat />
+                  </div>
+                  <p>Healthcare benefits</p>
+                </div>
 
-        <div className="flex items-center gap-3">
-          <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
-            <FaHome />
-          </div>
-          <p>Remote friendly</p>
-        </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
+                    <FaHome />
+                  </div>
+                  <p>Remote friendly</p>
+                </div>
 
-        <div className="flex items-center gap-3">
-          <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
-            <FaDumbbell />
-          </div>
-          <p>Wellness benefits</p>
-        </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
+                    <FaDumbbell />
+                  </div>
+                  <p>Wellness benefits</p>
+                </div>
 
-        <div className="flex items-center gap-3">
-          <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
-            <FaStar />
-          </div>
-          <p>Miscellaneous</p>
-        </div>
-      </div>
-    </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 border rounded-md bg-indigo-50 text-indigo-600 text-xl">
+                    <FaStar />
+                  </div>
+                  <p>Miscellaneous</p>
+                </div>
+              </div>
+            </div>
           </>
-         
-          
+
+
         );
       case 'funding':
         return (
           <>
             <div>
-            <h2 className="text-xl font-bold mb-2">Funding Details</h2>
-            <p className="text-gray-700 text-sm leading-6">Superfuel AI secured seed funding in August 2022, with the investment round led by Accel, a prominent venture capital firm based in San Francisco. While the exact amount remains undisclosed, this early-stage funding marks a significant milestone for the company, enabling it to scale its technology, expand its team, and accelerate product development. The involvement of Accel underscores strong investor confidence in Superfuel AI’s vision and potential within the AI landscape..</p>
-          </div>
+              <h2 className="text-xl font-bold mb-2">Funding Details</h2>
+              <p className="text-gray-700 text-sm leading-6">Superfuel AI secured seed funding in August 2022, with the investment round led by Accel, a prominent venture capital firm based in San Francisco. While the exact amount remains undisclosed, this early-stage funding marks a significant milestone for the company, enabling it to scale its technology, expand its team, and accelerate product development. The involvement of Accel underscores strong investor confidence in Superfuel AI’s vision and potential within the AI landscape..</p>
+            </div>
 
-          <div className="max-w-4xl mx-auto p-6 text-gray-800">
-      {/* Funding Rounds */}
-      <div className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Funding Rounds</h2>
-        <div className="flex items-center gap-4 mb-2">
-          <div className="flex items-center px-2 py-1 bg-orange-100 rounded">
-            <FaSeedling className="text-orange-500 mr-1" />
-          </div>
-          <h1 className="text-2xl font-bold">Undisclosed amount</h1>
-        </div>
-        <div className="flex gap-6 text-sm text-gray-500">
-          <p>Seed</p>
-          <p>Aug 2022</p>
-        </div>
-      </div>
+            <div className="max-w-4xl mx-auto p-6 text-gray-800">
+              {/* Funding Rounds */}
+              <div className="mb-10">
+                <h2 className="text-xl font-semibold mb-4">Funding Rounds</h2>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center px-2 py-1 bg-orange-100 rounded">
+                    <FaSeedling className="text-orange-500 mr-1" />
+                  </div>
+                  <h1 className="text-2xl font-bold">Undisclosed amount</h1>
+                </div>
+                <div className="flex gap-6 text-sm text-gray-500">
+                  <p>Seed</p>
+                  <p>Aug 2022</p>
+                </div>
+              </div>
 
-      {/* Investors */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Investors of Superfuel AI</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="border rounded-md p-4 shadow-sm">
-            <div className="flex justify-between items-start">
+              {/* Investors */}
               <div>
-                <h3 className="font-semibold text-md">Accel</h3>
-                <p className="text-sm text-gray-500">VC Firm • San Francisco</p>
-              </div>
-              <div className="border rounded-md px-2 py-1 text-xs text-gray-600">
-                Accel
-              </div>
-            </div>
+                <h2 className="text-xl font-semibold mb-4">Investors of Superfuel AI</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="border rounded-md p-4 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-md">Accel</h3>
+                        <p className="text-sm text-gray-500">VC Firm • San Francisco</p>
+                      </div>
+                      <div className="border rounded-md px-2 py-1 text-xs text-gray-600">
+                        Accel
+                      </div>
+                    </div>
 
-            <div className="mt-4">
-              <p className="text-xs text-gray-400 font-semibold mb-1">ROUNDS</p>
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 rounded text-xs text-orange-600">
-                <FaSeedling />
-                Seed
+                    <div className="mt-4">
+                      <p className="text-xs text-gray-400 font-semibold mb-1">ROUNDS</p>
+                      <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 rounded text-xs text-orange-600">
+                        <FaSeedling />
+                        Seed
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
           </>
-          
-          
+
+
         );
       case 'jobs':
         return (
           <div>
             <h2 className="text-xl font-bold mb-4">Open Positions</h2>
-            {jobs.map((job, idx) => (
+            {/* {jobs.map((job, idx) => (
               <div key={idx} className="border-b pb-4 mb-4">
                 <h3 className="text-blue-700 font-semibold hover:underline cursor-pointer">{job.title}</h3>
                 <p className="text-gray-600 text-sm">
@@ -350,7 +367,14 @@ const CompanyInfoPage = ({job}) => {
                   </div>
                 )}
               </div>
-            ))}
+            ))} */}
+
+            <ul>
+              {jobs.map(job => (
+                <li key={job._id}>{job.jobTitle} - {job.jobLocation}</li>
+              ))}
+            </ul>
+
           </div>
         );
       default:

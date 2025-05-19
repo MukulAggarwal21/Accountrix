@@ -175,6 +175,7 @@ const RecruiterSetup = () => {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem('companyId', data.company._id || data.company.id);
         // Success logic: show a message, move to completion step, etc.
         console.log('Company onboarded:', data);
         setCurrentStep(5); // Move to completion step

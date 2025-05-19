@@ -6,13 +6,15 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash, Eye, Users, Plus, Search, X } from 'lucide-react';
 import axios from 'axios';
 
-export default function JobList() {
+export default function JobList( {companyId} ) {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingJob, setViewingJob] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showAddJobModal, setShowAddJobModal] = useState(false);
+    const recruiterId = localStorage.getItem('recruiterId'); // <-- Add this line
+
   // const [newJob, setNewJob] = useState({
   //   title: '',
   //   description: '',
@@ -48,18 +50,46 @@ export default function JobList() {
 
 
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/jobs');
-        setJobs(response.data); // response.data is the array of jobs
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       const response = await axios.get('http://localhost:5000/jobs');
+  //       setJobs(response.data); // response.data is the array of jobs
+  //     } catch (error) {
+  //       console.error('Error fetching jobs:', error);
+  //     }
+  //   };
 
-    fetchJobs();
-  }, []);
+  //   fetchJobs();
+  // }, []);
+  // useEffect(() => {
+  //   if (!companyId) return; // Wait for companyId to be available
+  //   const fetchJobs = async () => {
+  //     try {
+  //       const response = await axios.get(`http://localhost:5000/jobs/byCompany/${companyId}`);
+  //       setJobs(response.data); // Only jobs for this company
+  //     } catch (error) {
+  //       console.error('Error fetching jobs:', error);
+  //     }
+  //   };
+  //   fetchJobs();
+  // }, [companyId]);
+
+
+useEffect(() => {
+  if (!companyId || !recruiterId) return; // Wait for both IDs
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`
+      );
+      setJobs(response.data); // Only jobs for this company and recruiter
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+  fetchJobs();
+}, [companyId, recruiterId]);
 
 
   // Filter jobs based on search term
@@ -115,9 +145,10 @@ export default function JobList() {
 
   const handleAddJob = async () => {
     try {
+      const companyId = localStorage.getItem('companyId'); // Get companyId from localStorage
       const jobData = {
         jobTitle: newJob.title,
-        jobDescription: newJob.description,
+        jobDescription: newJob.jobDescription,
         companyName: newJob.companyName,
         location: newJob.location,
         website: newJob.website,
@@ -128,6 +159,8 @@ export default function JobList() {
           currency: newJob.salary.currency,
           amount: parseFloat(newJob.salary.amount) || 0,
         },
+        company: companyId, // <-- Add this line to link job to company
+
       };
 
       const response = await axios.post('http://localhost:5000/jobs', jobData);
@@ -426,8 +459,6 @@ export default function JobList() {
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 mb-4"
                     />
-
-
                   </div>
                 </div>
 

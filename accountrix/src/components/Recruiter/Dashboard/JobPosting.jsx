@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   ChevronLeft, X, Clock,
@@ -18,18 +18,20 @@ import {
   Minus
 } from 'lucide-react';
 
-import { HeartIcon, GlobeAltIcon, LinkIcon , XMarkIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, GlobeAltIcon, LinkIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 
 export default function JobPosting({ step, setStep }) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [company, setCompany] = useState(null);
+
   const [newMarketOption, setNewMarketOption] = useState('');
   const [jobData, setJobData] = useState({
     jobTitle: '',
     jobDescription: '',
     companyName: '',
     companyLocation: '',
-    newMarketOption : '',
+    newMarketOption: '',
     jobLocation: '', // New field for Hybrid/In-Office work policy
     employeeCount: '',
     website: '',
@@ -82,26 +84,83 @@ export default function JobPosting({ step, setStep }) {
     });
   };
 
+  useEffect(() => {
+    // Fetch company info for the logged-in recruiter
+    const recruiterId = localStorage.getItem('recruiterId');
+    if (recruiterId) {
+      axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
+        .then(res => setCompany(res.data))
+        .catch(err => {
+          setCompany(null);
+          console.error('Error fetching company info:', err);
+        });
+    }
+  }, []);
+
+  // const handleSubmit = async () => {
+  //   const apiBaseUrl = 'http://localhost:5000';
+  //   if (!company || !company._id) {
+  //     alert("Company info not loaded. Please try again.");
+  //     return;
+  //   }
+  //   if (!jobData.jobLocation) {
+  //     alert("Job Location is required.");
+  //     return;
+  //   }
+  //   try {
+
+  //     const jobPayload = {
+  //       ...jobData,
+  //       company: company._id, // <-- This is required!
+  //     };
+
+
+  //     const response = await axios.post(`${apiBaseUrl}/jobs`, jobData, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+
+  //     if (response.status === 200 || response.status === 201) {
+  //       console.log('Job posting submitted successfully:', response.data);
+  //       setStep(1); // Reset the form or navigate to another page
+  //     }
+  //   } catch (error) {
+  //     console.error('Error submitting job posting:', error);
+  //   }
+  // };
+
+
+  // ...existing code...
 
 
   const handleSubmit = async () => {
-    const apiBaseUrl = 'http://localhost:5000';
+  const apiBaseUrl = 'http://localhost:5000';
+  const recruiterId = localStorage.getItem('recruiterId');
+  const companyId = localStorage.getItem('companyId');
+  if (!companyId || !recruiterId) {
+    alert("Company or recruiter info not loaded. Please try again.");
+    return;
+  }
+  // ...validation...
+  try {
+    const jobPayload = {
+      ...jobData,
+      company: companyId,
+      recruiter: recruiterId, // <-- Add this line!
+    };
+    const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    // ...existing code...
+  } catch (error) {
+    // ...existing code...
+  }
+};
+// ...existing code...
 
-    try {
-      const response = await axios.post(`${apiBaseUrl}/jobs`, jobData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
 
-      if (response.status === 200 || response.status === 201) {
-        console.log('Job posting submitted successfully:', response.data);
-        setStep(1); // Reset the form or navigate to another page
-      }
-    } catch (error) {
-      console.error('Error submitting job posting:', error);
-    }
-  };
+
 
   const handleInputChange = (field, value) => {
     setJobData((prev) => ({
@@ -319,12 +378,12 @@ export default function JobPosting({ step, setStep }) {
             </div>
           </div>
 
-  
+
 
 
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-800 mb-3">
-           <span className="text-black-500">*Company Market</span>
+              <span className="text-black-500">*Company Market</span>
             </label>
 
             {/* Selected Market Values */}

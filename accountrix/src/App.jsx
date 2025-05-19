@@ -44,7 +44,7 @@ function App() {
         <Route path="/allapplication" element={<AllApplication />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/notification" element={<NotificationPage />} />
-                <Route path="/company" element={<CompanyCultureForm />} />
+        <Route path="/company" element={<CompanyCultureForm />} />
 
       </Routes>
 

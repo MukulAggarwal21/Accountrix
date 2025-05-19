@@ -35,6 +35,42 @@ export default function Dashboard() {
   const [change, setChange] = useState(0);
   const [positive, setPositive] = useState(true);
 
+  const [company, setCompany] = useState(null);
+  const companyId = localStorage.getItem('companyId');
+
+
+  // useEffect(() => {
+  //   const recruiterId = localStorage.getItem('recruiterId');
+  //   if (recruiterId) {
+  //     axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
+  //       .then(res => setCompany(res.data))
+  //       .catch(err => {
+  //         setCompany(null);
+  //         console.error('Error fetching company info:', err);
+  //       });
+  //   }
+  // }, []);
+
+
+useEffect(() => {
+  const recruiterId = localStorage.getItem('recruiterId');
+  if (recruiterId) {
+    axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
+      .then(res => {
+        setCompany(res.data);
+        if (res.data && res.data._id) {
+          localStorage.setItem('companyId', res.data._id);
+        }
+      })
+      .catch(err => {
+        setCompany(null);
+        console.error('Error fetching company info:', err);
+      });
+  }
+}, []);
+
+
+
   const prevJobCountRef = useRef(0); // To keep previous jobs count
 
 
@@ -186,7 +222,8 @@ export default function Dashboard() {
       <div className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-indigo-700 transition-all duration-300 lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
         <div className="flex h-16 items-center justify-center">
-          <h1 className="text-2xl font-bold text-white">Accountrix</h1>
+          <h1 className="text-2xl font-bold text-white">    {company ? company.companyName : "Accountrix"}
+          </h1>
           <button
             className="absolute right-4 top-4 text-white lg:hidden"
             onClick={() => setSidebarOpen(false)}
@@ -288,7 +325,9 @@ export default function Dashboard() {
         {step == 3 && <InterviewSchedule />}
         {step == 4 && <ComingSoon />}
 
-        {step == 5 && <JobList />}
+        {/* {step == 5 && <JobList companyId={company?._id} />} */}
+        {step == 5 && <JobList companyId={companyId} />}
+
         {step == 6 && <RecruiterBlogDashboard />}
         {step == 7 && <RecruiterProfile />}
 

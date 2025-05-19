@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect  } from "react";
 import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
 import JobSearchInfoPage from "../Student/JobSearch/JobSearchInfoPage";
