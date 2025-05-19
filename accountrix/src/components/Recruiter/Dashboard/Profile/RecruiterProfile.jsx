@@ -3,11 +3,12 @@ import axios from 'axios';
 import { User, Building, Mail, Globe, MapPin, Users, Award, Phone, Edit, Clock, Calendar, Briefcase, Check } from 'lucide-react';
 import ProfileStatsCard from './ProfileStatsCard';
 import MainContent from './MainContent';
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function RecruiterProfile({ companyId, recruiterId }) {
   const [activeTab, setActiveTab] = useState('profile');
 
- const [companyData, setCompanyData] = useState(null);
+  const [companyData, setCompanyData] = useState(null);
 
   useEffect(() => {
     if (!companyId) return;
@@ -20,7 +21,18 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
     return <div>Loading...</div>;
   }
 
-
+  const handleDeleteCompany = async () => {
+    if (!window.confirm("Are you sure you want to delete this company? This action cannot be undone.")) return;
+    try {
+      await axios.delete(`http://localhost:5000/company/${companyId}`);
+      toast.success("Company deleted successfully.");
+      setTimeout(() => {
+        window.location.href = "/"; // or navigate to login/home
+      }, 2000);
+    } catch (error) {
+      toast.error("Failed to delete company: " + (error.response?.data?.message || error.message));
+    }
+  };
   // Sample data - in a real app this would come from API/props
   const profileData = {
     name: "Sarah Johnson",
@@ -165,7 +177,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {profileData.teamMembers.map((member, index) => (
+                  {companyData.teamMembers.map((member, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -178,7 +190,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{member.role}</div>
+                        <div className="text-sm text-gray-900">{member.role.toUpperCase()}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{member.email}</div>
@@ -329,12 +341,14 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                     <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-left">
                       Enable Two-Factor Authentication
                     </button>
-                    <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-left">
-                      Manage API Keys
-                    </button>
+
                   </div>
 
-                  <div className="mt-6 pt-6 border-t border-gray-200">
+
+                  <div onClick={handleDeleteCompany}
+
+                    className="mt-6 pt-6 border-t border-gray-200">
+                    <ToastContainer />
                     <h3 className="text-sm font-medium text-gray-900 mb-4">Account Actions</h3>
                     <button className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-left">
                       Delete Account
@@ -346,6 +360,6 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

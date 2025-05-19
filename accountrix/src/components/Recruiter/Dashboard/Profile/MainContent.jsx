@@ -45,7 +45,7 @@ export default function MainContent({ profileData, companyData }) {
                   <Briefcase className="h-5 w-5 text-gray-400 mt-1 mr-3" />
                   <div>
                     <p className="text-sm font-medium text-gray-500">Market</p>
-                    <p className="mt-1"> <div className="grid grid-cols-4 gap-4">
+                    <div className="mt-1"> <div className="grid grid-cols-4 gap-4">
                       {companyData.marketValues.map((value, index) => (
                         <span
                           key={index}
@@ -54,7 +54,7 @@ export default function MainContent({ profileData, companyData }) {
                           {value}
                         </span>
                       ))}
-                    </div></p>
+                    </div></div>
                   </div>
                 </div>
                 <div className="flex items-start">
