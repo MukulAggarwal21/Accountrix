@@ -16,7 +16,7 @@ const PersonalInfoForm = ({ formData, handleInputChange, handleFileUpload, setFo
           </label>
           <div className="flex items-center space-x-4">
             <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-              {formData.profilePhoto ? (
+              {/* {formData.profilePhoto ? (
                 <img
                   src={URL.createObjectURL(formData.profilePhoto)}
                   alt="Profile"
@@ -24,7 +24,27 @@ const PersonalInfoForm = ({ formData, handleInputChange, handleFileUpload, setFo
                 />
               ) : (
                 <UserIcon className="h-8 w-8 text-gray-400" />
+              )} */}
+
+              {formData.profilePhoto ? (
+                typeof formData.profilePhoto === 'string' ? (
+                  <img
+                    src={formData.profilePhoto}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={URL.createObjectURL(formData.profilePhoto)}
+                    alt="image"
+                    className="h-full w-full object-cover"
+                  />
+                )
+              ) : (
+                <UserIcon className="h-8 w-8 text-gray-400" />
               )}
+
+
             </div>
             <button
               type="button"

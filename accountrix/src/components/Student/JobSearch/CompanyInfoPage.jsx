@@ -1,62 +1,33 @@
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   FaTwitter,
   FaLinkedin,
   FaShareAlt, FaHeartbeat, FaDumbbell, FaHome, FaStar, FaSeedling
 } from "react-icons/fa";
-const CompanyInfoPage = ({ job }) => {
+const CompanyInfoPage = ({ job, companyId }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [jobs, setJobs] = useState([]);
-  const [company, setCompany] = useState({});
+  // const [company, setCompany] = useState({});
+  const [company, setCompany] = useState(job.company || {});
 
-  const companyId = job.company; // This should be the ObjectId
 
   useEffect(() => {
-    async function fetchCompanyAndJobs() {
-      const companyRes = await fetch(`http://localhost:5000/company/${companyId}`);
-      const company = await companyRes.json();
-      setCompany(company);
-
-      const jobsRes = await fetch(`http://localhost:5000/jobs/byCompany/${companyId}`);
-      const jobs = await jobsRes.json();
-      setJobs(jobs);
+    // If company is already provided, don't fetch
+    if (job.company) {
+      setCompany(job.company);
+      return;
     }
-    fetchCompanyAndJobs();
-  }, [companyId]);
+    // Fallback: fetch by companyId if needed
+    const companyId = job.company?._id || job.company;
+    if (!companyId) return;
+    axios.get(`http://localhost:5000/company/${companyId}`)
+      .then(res => setCompany(res.data))
+      .catch(err => console.error("Error fetching company:", err));
+  }, [job]);
 
-  // const jobs = [
-  //   {
-  //     title: 'AI Engineer',
-  //     location: 'Remote only • Bangalore Urban',
-  //     posted: '14 days ago',
-  //     salary: '₹18L – ₹20L',
-  //     showActions: true,
-  //   },
-  //   {
-  //     title: 'Product Engineer',
-  //     location: 'Remote only • Bengaluru',
-  //     posted: '',
-  //     salary: '₹17L – ₹25L',
-  //     showActions: false,
-  //   },
-  //   {
-  //     title: 'AI Engineer',
-  //     location: 'Remote only • Bangalore Urban',
-  //     posted: '14 days ago',
-  //     salary: '₹18L – ₹20L',
-  //     showActions: true,
-  //   },
-  //   {
-  //     title: 'AI Engineer',
-  //     location: 'Remote only • Bangalore Urban',
-  //     posted: '14 days ago',
-  //     salary: '₹18L – ₹20L',
-  //     showActions: true,
-  //   },
-
-  // ];
-
+  if (!company) return <div>Loading company info...</div>;
 
 
   const renderContent = () => {
@@ -65,8 +36,8 @@ const CompanyInfoPage = ({ job }) => {
         return (
           <>
             <div>
-              <h2 className="text-xl font-bold mb-2">{job.companyName}</h2>
-              <h3 className="text-lg font-semibold mb-2">AI employee for Amazon sellers</h3>
+              <h2 className="text-xl font-bold mb-2">{company.companyName}</h2>
+              <h3 className="text-lg font-semibold mb-2">{company.pitch}</h3>
               <p className="text-gray-700 text-sm leading-6">
                 {job.jobDescription}    </p>
             </div>

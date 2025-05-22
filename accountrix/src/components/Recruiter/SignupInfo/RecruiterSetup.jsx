@@ -79,12 +79,44 @@ const RecruiterSetup = () => {
     });
   };
 
-  const handleFileUpload = (name, file) => {
-    setFormData({
-      ...formData,
-      [name]: file,
-    });
+
+  const handleFileUpload = async (name, file) => {
+    if (!file) {
+      setFormData({
+        ...formData,
+        [name]: '',
+      });
+      return;
+    }
+
+    try {
+      const fileData = new FormData();
+      fileData.append('file', file);
+      const backendUrl = "http://localhost:5000";
+
+      const response = await fetch('http://localhost:5000/upload', {
+        method: 'POST',
+        body: fileData,
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('File upload failed');
+      const data = await response.json();
+
+      setFormData({
+        ...formData,
+        [name]: backendUrl + data.fileUrl, // Store the URL string
+      });
+    } catch (error) {
+      alert('Failed to upload file. Please try again.', error);
+      setFormData({
+        ...formData,
+        [name]: '',
+      });
+    }
   };
+
+
 
   const handleTeamMemberChange = (index, field, value) => {
     const updatedTeamMembers = [...formData.teamMembers];
@@ -146,13 +178,6 @@ const RecruiterSetup = () => {
     }
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   // Submit form data to backend
-  //   console.log('Form submitted:', formData);
-  //   setCurrentStep(5); // Move to completion step
-  // };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -189,6 +214,7 @@ const RecruiterSetup = () => {
       alert("An error occurred while submitting the form.");
     }
   };
+
 
 
 

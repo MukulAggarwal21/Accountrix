@@ -1,5 +1,5 @@
 
-import React, { useEffect  } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
 import JobSearchInfoPage from "../Student/JobSearch/JobSearchInfoPage";
@@ -91,19 +91,39 @@ const JobCard = () => {
             </div>
 
             {/* Arrow */}
+<div
+  onClick={async () => {
+    // Prefer recruiter.company, fallback to job.company
+    const companyId =
+      (job.recruiter && job.recruiter.company) ||
+      job.company ||
+      null;
 
-            <div
+    if (!companyId) {
+      alert("Company not found for this job. This may be an old job posting without recruiter info.");
+      return;
+    }
 
-              onClick={() => {
-                setDetailType("company");
-                setSelectedJob(job); // Set the selected job
-                setShowDetails(true); // Show the details modal
-                setShowDetails(true)
-              }}
+    // Fetch company details
+    let companyData = null;
+    try {
+      const companyRes = await axios.get(`http://localhost:5000/company/${companyId}`);
+      companyData = companyRes.data;
+    } catch (err) {
+      alert("Failed to fetch company info", err);
+      return;
+    }
 
-              className="text-gray-400 hover:text-gray-600 mt-2">
-              <ExternalLink size={18} />
-            </div>
+    setDetailType("company");
+    setSelectedJob({ ...job, company: companyData });
+    setShowDetails(true);
+  }}
+  className="text-gray-400 hover:text-gray-600 mt-2"
+>
+  <ExternalLink size={18} />
+</div>
+
+
           </div>
 
           <hr />
@@ -132,7 +152,7 @@ const JobCard = () => {
                 Save
               </button>
 
-              <ToastContainer  />
+              <ToastContainer />
 
               <button
 
@@ -180,8 +200,8 @@ const JobCard = () => {
                   ✕
                 </button>
 
+                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index} /> : <CompanyInfoPage job={selectedJob} index={index} />}
 
-                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index} /> : <CompanyInfoPage   job={selectedJob} index={index}/>}
               </div>
             </div>
           )}
