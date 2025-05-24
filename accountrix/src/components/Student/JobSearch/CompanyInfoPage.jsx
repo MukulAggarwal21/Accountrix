@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   FaTwitter,
   FaLinkedin,
+  FaFacebook, FaInstagram,
   FaShareAlt, FaHeartbeat, FaDumbbell, FaHome, FaStar, FaSeedling
 } from "react-icons/fa";
 const CompanyInfoPage = ({ job, companyId }) => {
@@ -87,9 +88,9 @@ const CompanyInfoPage = ({ job, companyId }) => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <h3 className="font-bold text-sm">Emil Soman</h3>
-                    <p className="text-sm">Co-Founder &amp; CTO</p>
-                    <p className="text-sm text-gray-500">Founder at Dockup (YC W19)</p>
+                    <h3 className="font-bold text-sm">{company.name}</h3>
+                    <p className="text-sm">Founder &amp; CEO</p>
+                    <p className="text-sm text-gray-500">Founder at {company.location}</p>
                   </div>
                 </div>
               </section>
@@ -100,11 +101,11 @@ const CompanyInfoPage = ({ job, companyId }) => {
                 <div className="flex gap-6">
                   <div className="border p-4 rounded-lg shadow-sm w-40">
                     <p className="text-xs text-gray-500">FUNDED OVER</p>
-                    <p className="text-lg font-medium">1 round</p>
+                    <p className="text-lg font-medium">{company.totalRounds} round</p>
                   </div>
                   <div className="border p-4 rounded-lg shadow-sm w-60">
                     <p className="text-xs text-gray-500">LATEST ROUND</p>
-                    <p className="text-lg font-medium">Seed (Aug 2022)</p>
+                    <p className="text-lg font-medium">{company.lastRoundDate}</p>
                   </div>
                 </div>
               </section>
@@ -404,24 +405,36 @@ const CompanyInfoPage = ({ job, companyId }) => {
 
             <a href="https://superfuel.io" target="_blank" rel="noreferrer">{job.website}</a>
           </div>
-          <div className="text-sm text-gray-600 mb-4">📍<span className="text-blue-600 underline">{job.jobLocation}</span></div>
-          <div className="text-sm text-gray-700 mb-1">Company size: <span className="text-black">{job.employeeCount} people</span></div>
-          <div className="text-sm text-gray-700 mb-4">Company type: <span className="text-black">SaaS</span></div>
-
+          <div className="text-sm text-gray-600 mb-4">📍<span className="text-black font-bold ">{company.location}</span></div>
+          <div className="text-sm text-gray-700 mb-1">Company size: <span className="text-black">{company.employeeCount} people</span></div>
+          <div className="text-sm text-gray-700 mb-4">Company type: <span className="text-black">{company.market}</span></div>
           <div>
             <h5 className="text-sm font-semibold mb-1">Markets</h5>
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="bg-gray-200 px-2 py-1 rounded-md">SaaS</span>
-              <span className="bg-gray-200 px-2 py-1 rounded-md">B2B</span>
-              <span className="bg-gray-200 px-2 py-1 rounded-md">Artificial Intelligence</span>
-              <span className="bg-gray-200 px-2 py-1 rounded-md">Ecommerce</span>
+              {company.marketValues && company.marketValues.length > 0 ? (
+                company.marketValues.map((market, index) => (
+                  <span
+                    key={index}
+                    className="bg-gray-200 px-2 py-1 rounded-md"
+                  >
+                    {market}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500 italic">No markets specified</span>
+              )}
             </div>
           </div>
 
+
           {/* Social Icons */}
           <div className="flex gap-4 mt-4 text-xl text-gray-600">
-            <a href="#"><FaTwitter /></a>
-            <a href="#"><FaLinkedin /></a>
+            <a href={company.twitter}><FaTwitter /></a>
+            <a href={company.linkedin}><FaLinkedin /></a>
+            <a href={company.facebook}><FaFacebook /></a>
+
+            <a href={company.instagram}><FaInstagram /></a>
+
           </div>
         </div>
 

@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   ChevronLeft, X, Clock,
@@ -22,6 +25,7 @@ import { HeartIcon, GlobeAltIcon, LinkIcon, XMarkIcon } from '@heroicons/react/2
 
 
 export default function JobPosting({ step, setStep }) {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [company, setCompany] = useState(null);
 
@@ -134,30 +138,61 @@ export default function JobPosting({ step, setStep }) {
   // ...existing code...
 
 
+  //   const handleSubmit = async () => {
+  //   const apiBaseUrl = 'http://localhost:5000';
+  //   const recruiterId = localStorage.getItem('recruiterId');
+  //   const companyId = localStorage.getItem('companyId');
+  //   if (!companyId || !recruiterId) {
+  //     alert("Company or recruiter info not loaded. Please try again.");
+  //     return;
+  //   }
+  //   // ...validation...
+  //   try {
+  //     const jobPayload = {
+  //       ...jobData,
+  //       company: companyId,
+  //       recruiter: recruiterId, // <-- Add this line!
+  //     };
+  //     const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
+  //       headers: { 'Content-Type': 'application/json' },
+  //     });
+  //     // ...existing code...
+  //   } catch (error) {
+  //     // ...existing code...
+  //   }
+  // };
+
+
   const handleSubmit = async () => {
-  const apiBaseUrl = 'http://localhost:5000';
-  const recruiterId = localStorage.getItem('recruiterId');
-  const companyId = localStorage.getItem('companyId');
-  if (!companyId || !recruiterId) {
-    alert("Company or recruiter info not loaded. Please try again.");
-    return;
-  }
-  // ...validation...
-  try {
-    const jobPayload = {
-      ...jobData,
-      company: companyId,
-      recruiter: recruiterId, // <-- Add this line!
-    };
-    const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-    // ...existing code...
-  } catch (error) {
-    // ...existing code...
-  }
-};
-// ...existing code...
+    const apiBaseUrl = 'http://localhost:5000';
+    const recruiterId = localStorage.getItem('recruiterId');
+    const companyId = localStorage.getItem('companyId');
+    if (!companyId || !recruiterId) {
+      alert("Company or recruiter info not loaded. Please try again.");
+      return;
+    }
+    try {
+      const jobPayload = {
+        ...jobData,
+        company: companyId,
+        recruiter: recruiterId,
+      };
+      const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (response.status === 200 || response.status === 201) {
+        toast.success('Job posted successfully!');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500); // Wait for toast to show
+      }
+    } catch (error) {
+      toast.error('Failed to post job. Please try again.');
+    }
+  };
+
+
+  // ...existing code...
 
 
 
@@ -595,6 +630,8 @@ export default function JobPosting({ step, setStep }) {
 
   return (
     <div className="px-8 py-8 overflow-y-auto">
+      <ToastContainer />
+
       {renderProgressBar()}
       {currentStep === 1 && renderStep1()}
       {currentStep === 2 && renderStep2()}
