@@ -205,7 +205,7 @@ const JobCard = () => {
                   ✕
                 </button>
 
-                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index} /> : <CompanyInfoPage job={selectedJob} index={index} />}
+                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} key={selectedJob?._id || index} index={index} /> : <CompanyInfoPage job={selectedJob} index={index} />}
 
               </div>
             </div>

@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const JobSearchInfoPage = ({ job }) => {
   const [interestMsg, setInterestMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [hasApplied, setHasApplied] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId || !job?._id) return;
+    fetch(`http://localhost:5000/applications/has-applied?jobId=${job._id}&userId=${userId}`)
+      .then(res => res.json())
+      .then(data => setHasApplied(data.applied));
+  }, [job]);
 
   const handleApply = async () => {
     setSubmitting(true);
     setSubmitStatus(null);
-    // Get user info from localStorage (adjust as per your auth logic)
-    const userId = localStorage.getItem('userId'); // This is the applicant's ID
+    const userId = localStorage.getItem('userId');
     // Debug log
     console.log('Applying with:', { jobId: job?._id, applicantId: userId, message: interestMsg });
 
-    // Validation before sending
     if (!job?._id) {
       setSubmitStatus('error');
       setSubmitting(false);
@@ -22,7 +29,7 @@ const JobSearchInfoPage = ({ job }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/applications`, {
+      const res = await fetch('http://localhost:5000/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -35,8 +42,18 @@ const JobSearchInfoPage = ({ job }) => {
       if (res.ok) {
         setSubmitStatus('success');
         setInterestMsg('');
+        setHasApplied(true); // Mark as applied after success
       } else {
+        // Try to parse error message
+        let errorMsg = 'error';
+        try {
+          const data = await res.json();
+          errorMsg = data.message;
+        } catch {}
         setSubmitStatus('error');
+        if (errorMsg && errorMsg.includes('already applied')) {
+          setHasApplied(true);
+        }
       }
     } catch (err) {
       setSubmitStatus('error');
@@ -125,11 +142,11 @@ const JobSearchInfoPage = ({ job }) => {
               disabled={submitting}
             />
             <button
-              className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 w-full"
+              className={`w-full rounded px-5 py-2 font-semibold ${hasApplied ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}
               onClick={handleApply}
-              disabled={submitting || !interestMsg.trim()}
+              disabled={submitting || !interestMsg.trim() || hasApplied}
             >
-              {submitting ? 'Applying...' : 'Apply'}
+              {hasApplied ? 'Applied' : (submitting ? 'Applying...' : 'Apply')}
             </button>
             {submitStatus === 'success' && (
               <div className="text-green-600 mt-2 text-sm">Application sent!</div>
