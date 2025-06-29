@@ -10,6 +10,7 @@ import {
   X,
   User,
   Star,
+  LogOut,
 
 } from 'lucide-react';
 
@@ -27,7 +28,7 @@ import RecruiterBlogDashboard from './Blog/Blog';
 import axios from 'axios';
 // import { response } from 'express';
 
-export default function Dashboard() {
+export default function Dashboard({ onLogout }) {
   // const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -39,113 +40,46 @@ export default function Dashboard() {
   const companyId = localStorage.getItem('companyId');
   const recruiterId = localStorage.getItem('recruiterId');
 
-
-  // useEffect(() => {
-  //   const recruiterId = localStorage.getItem('recruiterId');
-  //   if (recruiterId) {
-  //     axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
-  //       .then(res => setCompany(res.data))
-  //       .catch(err => {
-  //         setCompany(null);
-  //         console.error('Error fetching company info:', err);
-  //       });
-  //   }
-  // }, []);
-
-
-useEffect(() => {
-  const recruiterId = localStorage.getItem('recruiterId');
-  if (recruiterId) {
-    axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
-      .then(res => {
-        setCompany(res.data);
-        if (res.data && res.data._id) {
-          localStorage.setItem('companyId', res.data._id);
+  // Function to fetch and set companyId if missing
+  const fetchAndSetCompanyId = async () => {
+    const currentCompanyId = localStorage.getItem('companyId');
+    const currentRecruiterId = localStorage.getItem('recruiterId');
+    
+    // If companyId is missing but recruiterId exists, fetch company data
+    if (!currentCompanyId && currentRecruiterId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/company/byRecruiter/${currentRecruiterId}`);
+        if (response.data && response.data._id) {
+          localStorage.setItem('companyId', response.data._id);
+          setCompany(response.data);
+          console.log('CompanyId fetched and set:', response.data._id);
         }
-      })
-      .catch(err => {
-        setCompany(null);
-        console.error('Error fetching company info:', err);
-      });
-  }
-}, []);
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+      }
+    }
+  };
 
+  // Fetch company data and set companyId if missing
+  useEffect(() => {
+    fetchAndSetCompanyId();
+  }, []);
 
+  // Handle logout
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      // Fallback logout if onLogout prop is not provided
+      localStorage.removeItem('recruiterId');
+      localStorage.removeItem('companyId');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      window.location.href = '/';
+    }
+  };
 
   const prevJobCountRef = useRef(0); // To keep previous jobs count
-
-
-  // const job = async () => {
-  //   try {
-  //     const response = await axios.get('http://localhost:5000/jobs');
-  //     // setJobs(response.data);
-  //     const currentJobs = response.data;
-
-  //     const prevJobCount = prevJobCountRef.current; // previous count
-  //     const currentJobCount = currentJobs.length; // current count
-
-  //     const jobDifference = currentJobCount - prevJobCount;
-
-  //     // Update change and positive state
-  //     if (jobDifference !== 0) {
-  //       setChange(Math.abs(jobDifference)); // always positive number for display
-  //       setPositive(jobDifference > 0); // true if added, false if removed
-  //     } else {
-  //       setChange(0);
-  //       setPositive(true); // No change considered positive
-  //     }
-
-  //     // Update previous job count
-  //     prevJobCountRef.current = currentJobCount;
-
-  //     // Finally, set jobs
-  //     setJobs(currentJobs);
-
-  //   } catch (error) {
-  //     console.error('Error fetching jobs:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   job(); // Fetch jobs when component mounts
-  // }, []);
-
-
-  //   const job = async () => {
-  //   try {
-  //     const response = await axios.get('http://localhost:5000/jobs');
-  //     const currentJobs = response.data;
-  //     const currentJobCount = currentJobs.length;
-  //     const prevJobCount = prevJobCountRef.current; // Old value
-
-  //     // Compare
-  //     if (prevJobCount !== 0) { // Only compare after first fetch
-  //       const jobDifference = currentJobCount - prevJobCount;
-
-  //       setChange(Math.abs(jobDifference));
-  //       setPositive(jobDifference > 0);
-  //     }
-
-  //     // Set current jobs
-  //     setJobs(currentJobs);
-
-  //     // Update previous count AFTER comparison
-  //     prevJobCountRef.current = currentJobCount;
-
-  //   } catch (error) {
-  //     console.error('Error fetching jobs:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   job(); // First fetch
-
-  //   const interval = setInterval(() => {
-  //     job(); // Re-fetch every 5 seconds
-  //   }, 5000);
-
-  //   return () => clearInterval(interval); // Cleanup on unmount
-  // }, []);
 
   const job = async () => {
     try {
@@ -182,15 +116,9 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
-
-
   // Sample data
   const stats = [
-    // { label: 'Active Jobs', value: jobs.length, change: '+3', positive: true },
-    // { label: 'Active Jobs', value: jobs.length, change: `+${change}`, positive: positive },
-    // { label: 'Active Jobs', value: jobs.length, change: (positive ? '+' : '-') + change, positive },
     { label: 'Active Jobs', value: jobs.length, change: (change !== null ? (positive ? '+' : '-') + change : ''), positive },
-
     { label: 'Total Applicants', value: '642', change: '+28', positive: true },
     { label: 'Interviews', value: '38', change: '-5', positive: false },
     { label: 'Hired', value: '12', change: '+2', positive: true },
@@ -232,7 +160,6 @@ useEffect(() => {
             <X size={24} />
           </button>
         </div>
-
 
         <div className="flex-1 space-y-1 px-2 py-4">
           <div
@@ -299,15 +226,21 @@ useEffect(() => {
           </div>
         </div>
 
-
         <div className="flex items-center border-t border-indigo-800 p-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white">
             <User size={16} />
           </div>
-          <div className="ml-3">
+          <div className="ml-3 flex-1">
             <p className="text-sm font-medium text-white">Alex Morgan</p>
             <p className="text-xs text-indigo-200">Senior Recruiter</p>
           </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center p-2 text-indigo-200 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors"
+            title="Logout"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
 
@@ -317,22 +250,14 @@ useEffect(() => {
         {/* Top Navigation */}
         <Navigation setSidebarOpen={setSidebarOpen} />
 
-
         {/* Main Dashboard */}
         {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
-
-        {/* <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} /> */}
         {step == 2 && <AllApplication />}
         {step == 3 && <InterviewSchedule />}
         {step == 4 && <ComingSoon />}
-
-        {/* {step == 5 && <JobList companyId={company?._id} />} */}
         {step == 5 && <JobList companyId={companyId} />}
-
         {step == 6 && <RecruiterBlogDashboard />}
         {step == 7 && <RecruiterProfile  companyId={companyId} recruiterId={recruiterId}/>}
-
-
         {step == 8 && <JobPosting setStep={setStep} step={step} />}
       </div>
     </div>

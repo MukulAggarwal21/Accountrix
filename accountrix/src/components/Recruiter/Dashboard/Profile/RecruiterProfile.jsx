@@ -4,27 +4,82 @@ import { User, Building, Mail, Globe, MapPin, Users, Award, Phone, Edit, Clock, 
 import ProfileStatsCard from './ProfileStatsCard';
 import MainContent from './MainContent';
 import { ToastContainer, toast } from 'react-toastify';
+import { ensureCompanyId } from '../../../../lib/utils';
 
 export default function RecruiterProfile({ companyId, recruiterId }) {
   const [activeTab, setActiveTab] = useState('profile');
-
   const [companyData, setCompanyData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!companyId) return;
-    axios.get(`http://localhost:5000/company/${companyId}`)
-      .then(res => setCompanyData(res.data))
-      .catch(err => console.error('Error fetching company:', err));
-  }, [companyId]);
+    const fetchCompanyData = async () => {
+      try {
+        setLoading(true);
+        let companyResponse;
+
+        // Ensure companyId is available
+        const resolvedCompanyId = companyId || await ensureCompanyId();
+
+        // If companyId is available, use it directly
+        if (resolvedCompanyId) {
+          companyResponse = await axios.get(`http://localhost:5000/company/${resolvedCompanyId}`);
+        } 
+        // If no companyId but recruiterId is available, fetch by recruiter
+        else if (recruiterId) {
+          companyResponse = await axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`);
+          // If company is found, save the companyId to localStorage
+          if (companyResponse.data && companyResponse.data._id) {
+            localStorage.setItem('companyId', companyResponse.data._id);
+          }
+        } 
+        // If neither is available, show error
+        else {
+          throw new Error('No company or recruiter information available');
+        }
+
+        setCompanyData(companyResponse.data);
+      } catch (err) {
+        console.error('Error fetching company:', err);
+        toast.error('Failed to load company profile. Please complete your company setup first.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompanyData();
+  }, [companyId, recruiterId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">Loading company profile...</div>
+      </div>
+    );
+  }
 
   if (!companyData) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-lg text-gray-600 mb-4">No company profile found</div>
+          <div className="text-sm text-gray-500 mb-4">
+            Please complete your company setup to view your profile.
+          </div>
+          <button 
+            onClick={() => window.location.href = '/recruitersetup'}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Complete Setup
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const handleDeleteCompany = async () => {
     if (!window.confirm("Are you sure you want to delete this company? This action cannot be undone.")) return;
     try {
-      await axios.delete(`http://localhost:5000/company/${companyId}`);
+      await axios.delete(`http://localhost:5000/company/${companyData._id}`);
       toast.success("Company deleted successfully.");
       setTimeout(() => {
         window.location.href = "/"; // or navigate to login/home

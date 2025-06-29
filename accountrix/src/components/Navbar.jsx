@@ -40,13 +40,18 @@ import { useNavigate } from "react-router-dom";
 import accountrixLogo from "../assets/accountrix-logo.png";
 import { FaUserCircle, FaSignOutAlt, FaCog, FaBriefcase, FaBell } from "react-icons/fa";
 
-export default function Navbar({ isAuthenticated, setIsAuthenticated , backgroundColor }) {
+export default function Navbar({ isAuthenticated, setIsAuthenticated, backgroundColor, onLogout }) {
   const navigate = useNavigate();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    navigate("/");
+    if (onLogout) {
+      onLogout();
+    } else {
+      // Fallback to existing logout logic
+      setIsAuthenticated(false);
+      navigate("/");
+    }
   };
 
   return (

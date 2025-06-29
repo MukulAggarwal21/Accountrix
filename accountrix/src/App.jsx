@@ -1,10 +1,10 @@
-
 import './App.css'
 import Landing from './components/Landing/Landing'
 import JobSeach from './components/Student/JobSearch/JobSearchHeroSection';
 import JobSearchInfoPage from './components/Student/JobSearch/JobSearchInfoPage';
 import BrandHiring from './components/Student/BrandHiring/BrandHiring';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useState, useEffect, createContext, useContext } from 'react';
 
 import Dashboard from './components/Recruiter/Dashboard/Landing';
 import ViewJobs from './components/Recruiter/Dashboard/ViewJobs';
@@ -21,34 +21,201 @@ import RecruiterProfile from './components/Recruiter/Dashboard/Profile/Recruiter
 import BlogPage from './components/Recruiter/Dashboard/Blog/Blog';
 import NotificationPage from './components/Recruiter/Dashboard/Notification/Notification';
 import CompanyCultureForm from './components/Recruiter/SignupInfo/components/CompanyCultureForm';
-function App() {
+
+// Auth Context
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+// Auth Provider Component
+function AuthProvider({ children }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userType, setUserType] = useState(null);
+
+  // Check authentication status on app load and when localStorage changes
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const recruiterId = localStorage.getItem('recruiterId');
+      const userId = localStorage.getItem('userId');
+      
+      if (recruiterId) {
+        setIsAuthenticated(true);
+        setUserType('recruiter');
+      } else if (userId) {
+        setIsAuthenticated(true);
+        setUserType('student');
+      } else {
+        setIsAuthenticated(false);
+        setUserType(null);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for storage changes (when user logs out from another tab)
+    const handleStorageChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const login = (type) => {
+    setIsAuthenticated(true);
+    setUserType(type);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('recruiterId');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('companyId');
+    setIsAuthenticated(false);
+    setUserType(null);
+  };
+
+  const value = {
+    isAuthenticated,
+    userType,
+    login,
+    logout
+  };
 
   return (
-    <Router>
-      <Routes>
-        <Route path='/' element={<Landing />} />
-        <Route path='/jobsearch' element={<JobSeach />} />
-        <Route path='/brandhiring' element={<BrandHiring />} />
-        <Route path='/jobsearchinfopage' element={<JobSearchInfoPage />} />
-        {/* <Route path="/dashboard/*" element={<Dashboard />} /> */}
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="post-job" element={<PostJob />} />
-          <Route path="view-jobs" element={<ViewJobs />} />
-          <Route path="candidates" element={<Candidates />} />
-          <Route path="analytics" element={<Analytics />} />
-        </Route>
-        <Route path="/testing" element={<Testing />} />
-        <Route path="/jobposting" element={<JobPosting />} />
-        <Route path="/recruitersetup" element={<RecruiterSetup />} />
-        <Route path="/joblist" element={<JobList />} />
-        <Route path="/allapplication" element={<AllApplication />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/notification" element={<NotificationPage />} />
-        <Route path="/company" element={<CompanyCultureForm />} />
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-      </Routes>
+// Protected Route Component
+function ProtectedRoute({ children, allowedTypes }) {
+  const { isAuthenticated, userType } = useAuth();
+  const recruiterId = localStorage.getItem('recruiterId');
+  const userId = localStorage.getItem('userId');
 
-    </Router>
+  if (allowedTypes.includes('recruiter') && recruiterId && userType === 'recruiter') {
+    return children;
+  }
+  if (allowedTypes.includes('student') && userId && userType === 'student') {
+    return children;
+  }
+  
+  return <Navigate to="/" replace />;
+}
+
+// Public Route Component - prevents authenticated users from accessing public routes
+function PublicRoute({ children }) {
+  const { isAuthenticated, userType } = useAuth();
+  const recruiterId = localStorage.getItem('recruiterId');
+  const userId = localStorage.getItem('userId');
+
+  // If user is authenticated, redirect them to their appropriate dashboard
+  if (isAuthenticated) {
+    if (userType === 'recruiter' && recruiterId) {
+      return <Navigate to="/dashboard" replace />;
+    } else if (userType === 'student' && userId) {
+      return <Navigate to="/brandhiring" replace />;
+    }
+  }
+
+  // If not authenticated, show the public route
+  return children;
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public Route - only accessible when not authenticated */}
+          <Route path='/' element={
+            <PublicRoute>
+              <Landing />
+            </PublicRoute>
+          } />
+          
+          <Route path='/jobsearch' element={<JobSeach />} />
+          <Route path='/jobsearchinfopage' element={<JobSearchInfoPage />} />
+          
+          {/* Protected Routes */}
+          <Route path='/brandhiring' element={
+            <ProtectedRoute allowedTypes={['student']}>
+              <BrandHiring />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/dashboard" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <Dashboard />
+            </ProtectedRoute>
+          }>
+            <Route path="post-job" element={<PostJob />} />
+            <Route path="view-jobs" element={<ViewJobs />} />
+            <Route path="candidates" element={<Candidates />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
+          
+          <Route path="/testing" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <Testing />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/jobposting" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <JobPosting />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/recruitersetup" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <RecruiterSetup />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/joblist" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <JobList />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/allapplication" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <AllApplication />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/blog" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <BlogPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/notification" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <NotificationPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/company" element={
+            <ProtectedRoute allowedTypes={['recruiter']}>
+              <CompanyCultureForm />
+            </ProtectedRoute>
+          } />
+
+          {/* Catch all route - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
 

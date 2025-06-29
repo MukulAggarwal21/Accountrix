@@ -1,36 +1,20 @@
-
-
-
-
 import { useState, useEffect } from 'react';
 import { Edit, Trash, Eye, Users, Plus, Search, X } from 'lucide-react';
 import axios from 'axios';
+import { ensureCompanyId } from '../../../../lib/utils';
 
-export default function JobList( {companyId} ) {
+export default function JobList({ companyId: propCompanyId }) {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingJob, setViewingJob] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showAddJobModal, setShowAddJobModal] = useState(false);
-    const recruiterId = localStorage.getItem('recruiterId'); // <-- Add this line
+  const [resolvedCompanyId, setResolvedCompanyId] = useState(propCompanyId);
+  const recruiterId = localStorage.getItem('recruiterId');
+  const [jobApplicationCounts, setJobApplicationCounts] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // const [newJob, setNewJob] = useState({
-  //   title: '',
-  //   description: '',
-  //   companyName: '',
-  //   location: '',
-  //   website: '',
-  //   companyDescription: '',
-  //   skills: [],
-  //   skillInput: '',
-  //   workPolicy: 'On-site', // Default value
-  //   salary: {
-  //     currency: 'INR',
-  //     amount: '',
-  //   },
-  //   status: 'Active',
-  // });
   const [newJob, setNewJob] = useState({
     jobTitle: '',
     jobDescription: '',
@@ -48,49 +32,70 @@ export default function JobList( {companyId} ) {
     status: 'Active',
   });
 
+  useEffect(() => {
+    const fetchCompanyIdAndJobs = async () => {
+      try {
+        // Ensure companyId is available
+        const companyId = propCompanyId || await ensureCompanyId();
+        setResolvedCompanyId(companyId);
+        
+        console.log('Fetching jobs with companyId:', companyId, 'recruiterId:', recruiterId);
+        
+        if (recruiterId) {
+          // Primary approach: fetch jobs for this recruiter (works for all jobs)
+          try {
+            const recruiterJobsResponse = await axios.get(`http://localhost:5000/jobs/byRecruiter/${recruiterId}`);
+            console.log('Jobs fetched for recruiter:', recruiterJobsResponse.data);
+            
+            // If we have companyId, filter the jobs to only show those with matching company
+            let filteredJobs = recruiterJobsResponse.data;
+            if (companyId) {
+              filteredJobs = recruiterJobsResponse.data.filter(job => 
+                !job.company || job.company === companyId
+              );
+              console.log('Jobs filtered by company:', filteredJobs);
+            }
+            
+            setJobs(filteredJobs);
 
+            // Fetch application counts for each job
+            const counts = {};
+            for (const job of filteredJobs) {
+              try {
+                const applicationsResponse = await axios.get(`http://localhost:5000/applications/job/${job._id}`);
+                counts[job._id] = applicationsResponse.data.length;
+              } catch (error) {
+                console.error(`Error fetching applications for job ${job._id}:`, error);
+                counts[job._id] = 0;
+              }
+            }
+            setJobApplicationCounts(counts);
+          } catch (error) {
+            console.error('Error fetching jobs by recruiter:', error);
+            
+            // Fallback: try company and recruiter route for new jobs
+            if (companyId) {
+              try {
+                const response = await axios.get(
+                  `http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`
+                );
+                console.log('Jobs fetched by company and recruiter (fallback):', response.data);
+                setJobs(response.data);
+              } catch (fallbackError) {
+                console.error('Error in fallback job fetching:', fallbackError);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // useEffect(() => {
-  //   const fetchJobs = async () => {
-  //     try {
-  //       const response = await axios.get('http://localhost:5000/jobs');
-  //       setJobs(response.data); // response.data is the array of jobs
-  //     } catch (error) {
-  //       console.error('Error fetching jobs:', error);
-  //     }
-  //   };
-
-  //   fetchJobs();
-  // }, []);
-  // useEffect(() => {
-  //   if (!companyId) return; // Wait for companyId to be available
-  //   const fetchJobs = async () => {
-  //     try {
-  //       const response = await axios.get(`http://localhost:5000/jobs/byCompany/${companyId}`);
-  //       setJobs(response.data); // Only jobs for this company
-  //     } catch (error) {
-  //       console.error('Error fetching jobs:', error);
-  //     }
-  //   };
-  //   fetchJobs();
-  // }, [companyId]);
-
-
-useEffect(() => {
-  if (!companyId || !recruiterId) return; // Wait for both IDs
-  const fetchJobs = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`
-      );
-      setJobs(response.data); // Only jobs for this company and recruiter
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  };
-  fetchJobs();
-}, [companyId, recruiterId]);
-
+    fetchCompanyIdAndJobs();
+  }, [propCompanyId, recruiterId]);
 
   // Filter jobs based on search term
   const filteredJobs = jobs.filter(job =>
@@ -116,7 +121,6 @@ useEffect(() => {
     setShowDeleteConfirm(id);
   };
 
-
   const confirmDelete = async () => {
     try {
       await axios.delete(`http://localhost:5000/jobs/${showDeleteConfirm}`);
@@ -126,7 +130,6 @@ useEffect(() => {
       console.error('Error deleting job:', error);
     }
   };
-
 
   const handleSaveEdit = async () => {
     try {
@@ -141,16 +144,22 @@ useEffect(() => {
     }
   };
 
-
-
   const handleAddJob = async () => {
     try {
-      const companyId = localStorage.getItem('companyId'); // Get companyId from localStorage
+      // Ensure companyId is available
+      const companyId = resolvedCompanyId || await ensureCompanyId();
+      
+      if (!companyId || !recruiterId) {
+        console.error('Company or recruiter info not available');
+        return;
+      }
+
       const jobData = {
-        jobTitle: newJob.title,
+        jobTitle: newJob.jobTitle,
         jobDescription: newJob.jobDescription,
         companyName: newJob.companyName,
-        location: newJob.location,
+        companyLocation: newJob.companyLocation,
+        jobLocation: newJob.jobLocation,
         website: newJob.website,
         companyDescription: newJob.companyDescription,
         skills: newJob.skills,
@@ -159,17 +168,19 @@ useEffect(() => {
           currency: newJob.salary.currency,
           amount: parseFloat(newJob.salary.amount) || 0,
         },
-        company: companyId, // <-- Add this line to link job to company
-
+        company: companyId,
+        recruiter: recruiterId,
+        status: newJob.status,
       };
 
       const response = await axios.post('http://localhost:5000/jobs', jobData);
-      setJobs([response.data, ...jobs]);
+      setJobs([response.data.job, ...jobs]);
       setShowAddJobModal(false);
       setNewJob({
         jobTitle: '',
         jobDescription: '',
         companyName: '',
+        companyLocation: '',
         jobLocation: '',
         website: '',
         companyDescription: '',
@@ -240,23 +251,23 @@ useEffect(() => {
             >
               <div className="p-6">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-semibold text-gray-900">{job.title || job.jobTitle}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{job.jobTitle}</h3>
                   <span className={`px-2 py-1 text-xs rounded-full ${job.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                     }`}>
                     {job.status || 'Active'}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">{job.location}</p>
+                <p className="text-sm text-gray-500 mt-1">{job.jobLocation}</p>
                 <p className="text-sm font-medium text-gray-700 mt-2">
-                  {job.salary?.currency || ''} {job.salary?.amount || job.salary || ''}
+                  {job.salary?.currency || ''} {job.salary?.amount || ''}
                 </p>
-                <p className="text-sm text-gray-600 mt-3 line-clamp-2">{job.description || job.jobDescription}</p>
+                <p className="text-sm text-gray-600 mt-3 line-clamp-2">{job.jobDescription}</p>
 
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-600">
                       <Users className="mr-2" size={16} />
-                      <span className="text-sm">{job.applicants || 0} Applicants</span>
+                      <span className="text-sm">{jobApplicationCounts[job._id] || 0} Applicants</span>
                     </div>
                     <span className="text-xs text-gray-500">{job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'Recently'}</span>
                   </div>
@@ -342,7 +353,7 @@ useEffect(() => {
 
               <div className="flex items-center text-gray-600 mb-4">
                 <Users className="mr-2" size={18} />
-                <span>{viewingJob.applicants || 0} Applicants</span>
+                <span>{jobApplicationCounts[viewingJob._id] || 0} Applicants</span>
                 <span className="mx-2">•</span>
                 <span>Posted {viewingJob.postedDate || 'Recently'}</span>
               </div>
@@ -415,16 +426,6 @@ useEffect(() => {
                   />
                 </div>
 
-                {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Salary</label>
-                    <input
-                      type="text"
-                      value={editingJob.salary}
-                      onChange={(e) => setEditingJob({ ...editingJob, salary: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div> */}
-
                 <div className="  grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
@@ -442,7 +443,6 @@ useEffect(() => {
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
                       <option value="GBP">GBP</option>
-                      {/* Add more currencies if needed */}
                     </select>
                   </div>
 
@@ -461,9 +461,6 @@ useEffect(() => {
                     />
                   </div>
                 </div>
-
-
-
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>

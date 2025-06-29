@@ -4,9 +4,11 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Import default styles
+import { useAuth } from '../../App';
 
-export default function LoginRegister({ setIsAuthenticated }) {
+export default function LoginRegister({ onLogin }) {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [showPassword, setShowPassword] = useState(false);
     const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
     const [formData, setFormData] = useState({
@@ -41,44 +43,30 @@ export default function LoginRegister({ setIsAuthenticated }) {
 
             const data = await response.json();
 
-            // if (!response.ok) {
-            //     throw new Error(data.message || 'Something went wrong');
-            // }
-
-            // // Handle successful response
-            // console.log('Success:', data);
-            // setIsAuthenticated(true); // Update authentication state
-
-            // if (activeTab === 'login') {
-            //     if (formData.role === 'recruiter') {
-            //         navigate('/dashboard');
-            //     } else if (formData.role === 'student') {
-            //         navigate('/brandhiring');
-            //     }
-            // } else if (activeTab === 'register') {
-            //     if (formData.role === 'recruiter') {
-            //         navigate('/recruitersetup');
-            //     } else if (formData.role === 'student') {
-            //         navigate('/brandhiring');
-            //     }
-            // }
-
-
             if (!response.ok) {
                 throw new Error(data.message || 'Something went wrong');
             }
 
             // Handle successful response
             console.log('Success:', data);
-            setIsAuthenticated(true); // Update authentication state
-
+            
             // Save recruiterId to localStorage if recruiter
-            // if (formData.role === 'recruiter' && data.user && data.user._id) {
-            //     localStorage.setItem('recruiterId', data.user._id);
-            // }
             if (formData.role === 'recruiter' && data.user && (data.user._id || data.user.id)) {
                 localStorage.setItem('recruiterId', data.user._id || data.user.id);
+                localStorage.setItem('userType', 'recruiter');
+                login('recruiter');
+            } else if (formData.role === 'student' && data.user && (data.user._id || data.user.id)) {
+                localStorage.setItem('userId', data.user._id || data.user.id);
+                localStorage.setItem('userName', data.user.fullName); // Save user's full name
+                localStorage.setItem('userType', 'student');
+                login('student');
             }
+            
+            // Call onLogin callback if provided
+            if (onLogin) {
+                onLogin(formData.role);
+            }
+            
             // Navigation logic
             if (activeTab === 'login') {
                 if (formData.role === 'recruiter') {
@@ -94,7 +82,6 @@ export default function LoginRegister({ setIsAuthenticated }) {
                 }
             }
 
-
         } catch (err) {
             // Show error as a toast notification
             toast.error(err.message, {
@@ -106,8 +93,6 @@ export default function LoginRegister({ setIsAuthenticated }) {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                // style: {"margin-top": "60px"},
-                // className:'lg:mt-20'
             });
             console.error('Error:', err);
         } finally {

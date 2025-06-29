@@ -1,7 +1,11 @@
 import React from 'react'
 import LoginRegister from '../Card/LoginRegister'
 import Navbar from '../Navbar'
-export default function LandingMain({ setIsAuthenticated , setUserType}) {
+import { useAuth } from '../../App'
+
+export default function LandingMain() {
+  const { login } = useAuth();
+
   return (
 
     <>
@@ -29,7 +33,7 @@ export default function LandingMain({ setIsAuthenticated , setUserType}) {
       </div>
 
       {/* Login/register Card - Right Side */}
-      <LoginRegister setIsAuthenticated={setIsAuthenticated} setUserType={setUserType} />
+      <LoginRegister onLogin={login} />
 
     </main>
     </>

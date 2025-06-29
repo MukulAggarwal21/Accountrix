@@ -1,7 +1,48 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 
 const JobSearchInfoPage = ({ job }) => {
+  const [interestMsg, setInterestMsg] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleApply = async () => {
+    setSubmitting(true);
+    setSubmitStatus(null);
+    // Get user info from localStorage (adjust as per your auth logic)
+    const userId = localStorage.getItem('userId'); // This is the applicant's ID
+    // Debug log
+    console.log('Applying with:', { jobId: job?._id, applicantId: userId, message: interestMsg });
+
+    // Validation before sending
+    if (!job?._id) {
+      setSubmitStatus('error');
+      setSubmitting(false);
+      alert('Job information is missing.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5000/applications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId: job._id,
+          applicantId: userId,
+          message: interestMsg,
+        }),
+        credentials: 'include'
+      });
+      if (res.ok) {
+        setSubmitStatus('success');
+        setInterestMsg('');
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (err) {
+      setSubmitStatus('error');
+    }
+    setSubmitting(false);
+  };
 
   if (!job) return null;
   return (
@@ -77,9 +118,25 @@ const JobSearchInfoPage = ({ job }) => {
               Is your profile up to date? Click <a href="#" className="text-blue-600 underline">here</a> to verify how you will appear to recruiters.
             </p>
             <label className="block text-sm font-medium mb-1">What interests you about working for this company?</label>
-            <textarea className="w-full border border-gray-300 rounded-md p-2 h-24 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            <button className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 w-full">Apply</button>
-
+            <textarea
+              className="w-full border border-gray-300 rounded-md p-2 h-24 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={interestMsg}
+              onChange={e => setInterestMsg(e.target.value)}
+              disabled={submitting}
+            />
+            <button
+              className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 w-full"
+              onClick={handleApply}
+              disabled={submitting || !interestMsg.trim()}
+            >
+              {submitting ? 'Applying...' : 'Apply'}
+            </button>
+            {submitStatus === 'success' && (
+              <div className="text-green-600 mt-2 text-sm">Application sent!</div>
+            )}
+            {submitStatus === 'error' && (
+              <div className="text-red-600 mt-2 text-sm">Failed to apply. Try again.</div>
+            )}
           </div>
 
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 import { HeartIcon, GlobeAltIcon, LinkIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ensureCompanyId } from '../../../lib/utils';
 
 
 export default function JobPosting({ step, setStep }) {
@@ -90,96 +91,46 @@ export default function JobPosting({ step, setStep }) {
 
   useEffect(() => {
     // Fetch company info for the logged-in recruiter
-    const recruiterId = localStorage.getItem('recruiterId');
-    if (recruiterId) {
-      axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
-        .then(res => setCompany(res.data))
-        .catch(err => {
-          setCompany(null);
-          console.error('Error fetching company info:', err);
-        });
-    }
+    const fetchCompanyData = async () => {
+      try {
+        // Ensure companyId is available
+        const companyId = await ensureCompanyId();
+        if (companyId) {
+          const response = await axios.get(`http://localhost:5000/company/${companyId}`);
+          setCompany(response.data);
+        }
+      } catch (err) {
+        setCompany(null);
+        console.error('Error fetching company info:', err);
+      }
+    };
+
+    fetchCompanyData();
   }, []);
-
-  // const handleSubmit = async () => {
-  //   const apiBaseUrl = 'http://localhost:5000';
-  //   if (!company || !company._id) {
-  //     alert("Company info not loaded. Please try again.");
-  //     return;
-  //   }
-  //   if (!jobData.jobLocation) {
-  //     alert("Job Location is required.");
-  //     return;
-  //   }
-  //   try {
-
-  //     const jobPayload = {
-  //       ...jobData,
-  //       company: company._id, // <-- This is required!
-  //     };
-
-
-  //     const response = await axios.post(`${apiBaseUrl}/jobs`, jobData, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-
-  //     if (response.status === 200 || response.status === 201) {
-  //       console.log('Job posting submitted successfully:', response.data);
-  //       setStep(1); // Reset the form or navigate to another page
-  //     }
-  //   } catch (error) {
-  //     console.error('Error submitting job posting:', error);
-  //   }
-  // };
-
-
-  // ...existing code...
-
-
-  //   const handleSubmit = async () => {
-  //   const apiBaseUrl = 'http://localhost:5000';
-  //   const recruiterId = localStorage.getItem('recruiterId');
-  //   const companyId = localStorage.getItem('companyId');
-  //   if (!companyId || !recruiterId) {
-  //     alert("Company or recruiter info not loaded. Please try again.");
-  //     return;
-  //   }
-  //   // ...validation...
-  //   try {
-  //     const jobPayload = {
-  //       ...jobData,
-  //       company: companyId,
-  //       recruiter: recruiterId, // <-- Add this line!
-  //     };
-  //     const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
-  //       headers: { 'Content-Type': 'application/json' },
-  //     });
-  //     // ...existing code...
-  //   } catch (error) {
-  //     // ...existing code...
-  //   }
-  // };
-
 
   const handleSubmit = async () => {
     const apiBaseUrl = 'http://localhost:5000';
     const recruiterId = localStorage.getItem('recruiterId');
-    const companyId = localStorage.getItem('companyId');
-    if (!companyId || !recruiterId) {
-      alert("Company or recruiter info not loaded. Please try again.");
-      return;
-    }
+    
     try {
+      // Ensure companyId is available
+      const companyId = await ensureCompanyId();
+      
+      if (!companyId || !recruiterId) {
+        toast.error("Company or recruiter info not loaded. Please try again.");
+        return;
+      }
+      
       const jobPayload = {
         ...jobData,
         company: companyId,
         recruiter: recruiterId,
       };
+      
       const response = await axios.post(`${apiBaseUrl}/jobs`, jobPayload, {
         headers: { 'Content-Type': 'application/json' },
       });
+      
       if (response.status === 200 || response.status === 201) {
         toast.success('Job posted successfully!');
         setTimeout(() => {
@@ -188,14 +139,9 @@ export default function JobPosting({ step, setStep }) {
       }
     } catch (error) {
       toast.error('Failed to post job. Please try again.');
+      console.error('Error posting job:', error);
     }
   };
-
-
-  // ...existing code...
-
-
-
 
   const handleInputChange = (field, value) => {
     setJobData((prev) => ({
@@ -220,9 +166,6 @@ export default function JobPosting({ step, setStep }) {
       skills: prev.skills.filter((skill) => skill !== skillToRemove),
     }));
   };
-
-
-
 
   const handleNextStep = () => {
     if (currentStep < totalSteps) {
