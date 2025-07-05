@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 export default function Navigation({ setSidebarOpen }) {
     const navigate = useNavigate()
     return (
-        <header className="flex h-16 items-center justify-between border-b bg-white px-6">
+        <header className="flex h-16 items-center justify-between border-b  bg-white px-6">
             <div className="flex items-center">
                 <button
                     className="mr-4 text-gray-600 lg:hidden"

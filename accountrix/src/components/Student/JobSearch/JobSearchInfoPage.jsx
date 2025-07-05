@@ -17,24 +17,28 @@ const JobSearchInfoPage = ({ job }) => {
   const handleApply = async () => {
     setSubmitting(true);
     setSubmitStatus(null);
+    // Get user info from localStorage (adjust as per your auth logic)
     const userId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName');
+    const companyId = job.company?._id || job.company;
     // Debug log
-    console.log('Applying with:', { jobId: job?._id, applicantId: userId, message: interestMsg });
+    console.log('Applying with:', { jobId: job._id, companyId, userId, userName, message: interestMsg });
 
-    if (!job?._id) {
-      setSubmitStatus('error');
-      setSubmitting(false);
-      alert('Job information is missing.');
-      return;
-    }
+    // // Validation before sending
+    // if (!companyId || !userId || !userName) {
+    //   setSubmitStatus('error');
+    //   setSubmitting(false);
+    //   alert('Missing required information. Please make sure you are logged in and your profile is complete.');
+    //   return;
+    // }
 
     try {
-      const res = await fetch('http://localhost:5000/applications', {
+      const res = await fetch(`http://localhost:5000/jobs/${job._id}/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          jobId: job._id,
-          applicantId: userId,
+          job: job._id,
+          applicant: userId,
           message: interestMsg,
         }),
         credentials: 'include'
@@ -44,16 +48,7 @@ const JobSearchInfoPage = ({ job }) => {
         setInterestMsg('');
         setHasApplied(true); // Mark as applied after success
       } else {
-        // Try to parse error message
-        let errorMsg = 'error';
-        try {
-          const data = await res.json();
-          errorMsg = data.message;
-        } catch {}
         setSubmitStatus('error');
-        if (errorMsg && errorMsg.includes('already applied')) {
-          setHasApplied(true);
-        }
       }
     } catch (err) {
       setSubmitStatus('error');
@@ -139,20 +134,19 @@ const JobSearchInfoPage = ({ job }) => {
               className="w-full border border-gray-300 rounded-md p-2 h-24 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={interestMsg}
               onChange={e => setInterestMsg(e.target.value)}
-              disabled={submitting}
+              disabled={submitting || hasApplied}
             />
             <button
               className={`w-full rounded px-5 py-2 font-semibold ${hasApplied ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'}`}
-              onClick={handleApply}
-              disabled={submitting || !interestMsg.trim() || hasApplied}
+              {...(hasApplied ? { disabled: true } : { onClick: handleApply, disabled: submitting || !interestMsg.trim() })}
             >
-              {hasApplied ? 'Applied' : (submitting ? 'Applying...' : 'Apply')}
+              {hasApplied ? 'Already applied' : (submitting ? 'Applying...' : 'Apply')}
             </button>
             {submitStatus === 'success' && (
               <div className="text-green-600 mt-2 text-sm">Application sent!</div>
             )}
             {submitStatus === 'error' && (
-              <div className="text-red-600 mt-2 text-sm">Failed to apply. Try again.</div>
+              <div className="text-red-600 mt-2 text-sm">{hasApplied ? 'You have already applied for this job.' : 'Failed to apply. Try again.'}</div>
             )}
           </div>
 

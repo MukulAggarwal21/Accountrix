@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { Bookmark, ExternalLink, Flag, EyeOff } from "lucide-react";
@@ -37,11 +38,8 @@ const JobCard = () => {
     const fetchjobs = async () => {
       try {
         const response = await axios.get('http://localhost:5000/jobs');
-        console.log('Fetched jobs:', response.data); // Debugging log for fetched jobs
-        // Log each job's _id and id to check its structure
-        response.data.forEach(job => {
-            console.log(`Job fetched: _id=${job._id}, id=${job.id}, title=${job.jobTitle}`);
-        });
+        console.log('Fetched jobs:', response.data); // Debugging log
+
         setJobs(response.data)
       } catch (error) {
         console.error('Error fetching jobs:', error);
@@ -160,10 +158,7 @@ const JobCard = () => {
 
                 onClick={() => {
                   setDetailType("job");
-                  // Debugging: Log the job object before setting selectedJob
-                  console.log('Job object being passed to selectedJob:', job);
-                  // Ensure _id is consistently available for selectedJob
-                  setSelectedJob({ ...job, _id: job._id || job.id }); // Use job._id or fallback to job.id
+                  setSelectedJob(job); // Set the selected job
                   setShowDetails(true); // Show the details modal
                   setShowDetails(true)
                 }}
@@ -205,7 +200,7 @@ const JobCard = () => {
                   ✕
                 </button>
 
-                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} key={selectedJob?._id || index} index={index} /> : <CompanyInfoPage job={selectedJob} index={index} />}
+                {detailType === "job" ? <JobSearchInfoPage job={selectedJob} index={index} /> : <CompanyInfoPage job={selectedJob} index={index} />}
 
               </div>
             </div>

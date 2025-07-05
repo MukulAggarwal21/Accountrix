@@ -40,23 +40,23 @@ import { useNavigate } from "react-router-dom";
 import accountrixLogo from "../assets/accountrix-logo.png";
 import { FaUserCircle, FaSignOutAlt, FaCog, FaBriefcase, FaBell } from "react-icons/fa";
 
-export default function Navbar({ isAuthenticated, setIsAuthenticated, backgroundColor, onLogout }) {
+export default function Navbar({ isAuthenticated, setIsAuthenticated , backgroundColor }) {
   const navigate = useNavigate();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const userType = localStorage.getItem('userType');
 
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      // Fallback to existing logout logic
-      setIsAuthenticated(false);
-      navigate("/");
-    }
+    setIsAuthenticated(false);
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('recruiterId');
+    localStorage.removeItem('userType');
+    navigate("/");
   };
 
   return (
-    <nav className={`${backgroundColor} text-white shadow-lg  top-0 left-0 w-full z-0`}>
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="bg-gradient-to-r from-blue-800 to-green-900  text-white shadow-lg  top-0 left-0 w-full z-0">
+           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center gap-4">
           <img
@@ -195,7 +195,15 @@ export default function Navbar({ isAuthenticated, setIsAuthenticated, background
           )}
 
           {/* Profile Section */}
-          {isAuthenticated ? (
+          {isAuthenticated && userType === 'student' ? (
+            <button
+              className="text-3xl hover:text-green-300 transition focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full"
+              title="View Profile"
+              onClick={() => navigate('/profile')}
+            >
+              <FaUserCircle />
+            </button>
+          ) : isAuthenticated ? (
             <div className="relative">
               <button
                 className="text-3xl hover:text-green-300 transition"
@@ -209,7 +217,7 @@ export default function Navbar({ isAuthenticated, setIsAuthenticated, background
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                     onClick={() => navigate("/profile")}
                   >
-                    <FaCog className="inline-block mr-2" /> Profile
+                    <FaUserCircle className="inline-block mr-2" /> Profile
                   </button>
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -218,10 +226,10 @@ export default function Navbar({ isAuthenticated, setIsAuthenticated, background
                     <FaBriefcase className="inline-block mr-2" /> My Jobs
                   </button>
                   <button
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 font-semibold flex items-center gap-2"
                     onClick={handleLogout}
                   >
-                    <FaSignOutAlt className="inline-block mr-2" /> Logout
+                    <FaSignOutAlt className="inline-block" /> Logout
                   </button>
                 </div>
               )}

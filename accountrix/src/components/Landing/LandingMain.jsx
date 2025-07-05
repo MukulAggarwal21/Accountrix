@@ -7,11 +7,11 @@ export default function LandingMain() {
   const { login } = useAuth();
 
   return (
-
     <>
-    <Navbar/>
-    <main className="relative z-5 flex flex-col lg:flex-row justify-center items-center px-6 py-16 lg:h-[calc(100vh-76px)] w-full max-w-7xl gap-20">
-      {/* Hero Section - Left Side */}
+      <Navbar/>
+
+    <main className="relative z-5 flex flex-col lg:flex-row sm:ml-10 lg:ml-28 justify-center items-center px-6  py-16 lg:h-[calc(100vh-76px)] w-full max-w-7xl  gap-20">
+
       <div className="text-white lg:w-3/5 w-full flex flex-col justify-center">
         <h2 className="text-lg font-semibold mb-4">FUTURE TALENT</h2>
         <h1 className="text-5xl font-bold mb-8 leading-tight">

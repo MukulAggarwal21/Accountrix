@@ -1,3 +1,4 @@
+
 import React from "react";
 import brandHiringImage from '../../../assets/images/brandhiring.png';
 import { useNavigate } from "react-router-dom";
@@ -12,27 +13,11 @@ import Newsletter from "../../Subscription/Subscription";
 import FAQSection from "@/components/FAQ/faqQuestion";
 import Footer from "../../Footer/footer";
 
-export default function BrandHiring({ onLogout }) {
+export default function BrandHiring() {
   const navigate = useNavigate();
-
-  // Handle logout
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      // Fallback logout if onLogout prop is not provided
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      localStorage.removeItem('recruiterId');
-      localStorage.removeItem('companyId');
-      window.location.href = '/';
-    }
-  };
-
   return (
     <>
-      <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" onLogout={handleLogout} />
-      <div className="bg-white w-full h-full font-sans">
+      <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" />
         <div
           className="relative w-full lg:h-[650px] h-[570px] bg-cover bg-center bg-no-repeat border-blue-900 flex items-center"
           style={{ backgroundImage: `url(${brandHiringImage})` }}
@@ -84,7 +69,6 @@ export default function BrandHiring({ onLogout }) {
             </div>
           </div>
         </div>
-      </div>
        <HeroSection />
 
             <Features />

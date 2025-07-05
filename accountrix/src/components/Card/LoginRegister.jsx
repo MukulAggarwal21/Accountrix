@@ -44,29 +44,34 @@ export default function LoginRegister({ onLogin }) {
             const data = await response.json();
 
             if (!response.ok) {
+                // Clear any stale localStorage
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('recruiterId');
+                localStorage.removeItem('userType');
                 throw new Error(data.message || 'Something went wrong');
             }
 
             // Handle successful response
             console.log('Success:', data);
-            
-            // Save recruiterId to localStorage if recruiter
+
+            // Save recruiterId/userId/userName/userType to localStorage
             if (formData.role === 'recruiter' && data.user && (data.user._id || data.user.id)) {
                 localStorage.setItem('recruiterId', data.user._id || data.user.id);
                 localStorage.setItem('userType', 'recruiter');
                 login('recruiter');
             } else if (formData.role === 'student' && data.user && (data.user._id || data.user.id)) {
                 localStorage.setItem('userId', data.user._id || data.user.id);
-                localStorage.setItem('userName', data.user.fullName); // Save user's full name
+                localStorage.setItem('userName', data.user.fullName);
                 localStorage.setItem('userType', 'student');
                 login('student');
             }
-            
+
             // Call onLogin callback if provided
             if (onLogin) {
                 onLogin(formData.role);
             }
-            
+
             // Navigation logic
             if (activeTab === 'login') {
                 if (formData.role === 'recruiter') {
@@ -93,6 +98,8 @@ export default function LoginRegister({ onLogin }) {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
+                // style: {"margin-top": "60px"},
+                // className:'lg:mt-20'
             });
             console.error('Error:', err);
         } finally {

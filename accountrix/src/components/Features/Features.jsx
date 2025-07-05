@@ -45,7 +45,7 @@ import React from 'react';
 const Features = () => {
   const features = [
     {
-      title: "AI-Powered Matching",
+      title: "AI-Powered Matching 4kjnkjfnfljrflr",
       description: "Get matched with the best opportunities using our AI-driven algorithms.",
       icon: "🤖",
     },

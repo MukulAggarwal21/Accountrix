@@ -1,153 +1,158 @@
-import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Mail, Phone, MapPin, Briefcase, Award, GraduationCap, X, ArrowLeft } from 'lucide-react';
+import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaSignOutAlt, FaBriefcase, FaGraduationCap } from 'react-icons/fa';
 
-export default function ApplicantProfile({ userId, onBack }) {
-  const [userProfile, setUserProfile] = useState(null);
+export default function ApplicantProfile() {
+  const { id } = useParams();
+  const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [appliedJobs, setAppliedJobs] = useState([]);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId) {
+    setLoading(true);
+    axios.get(`http://localhost:5000/user/${id}`)
+      .then(res => {
+        setStudent(res.data);
         setLoading(false);
-        return;
-      }
-      setLoading(true);
-      setError(null);
+      })
+      .catch(() => {
+        setStudent(null);
+        setError('Failed to load student profile.');
+        setLoading(false);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/user/${userId}`);
-        setUserProfile(response.data);
+        const res = await fetch(`http://localhost:5000/applications/user/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch jobs');
+        const jobs = await res.json();
+        setAppliedJobs(jobs);
       } catch (err) {
-        console.error('Error fetching user profile:', err);
-        setError('Failed to fetch user profile.');
-      } finally {
-        setLoading(false);
+        // ignore for now
       }
     };
+    fetchAppliedJobs();
+  }, [id]);
 
-    fetchUserProfile();
-  }, [userId]);
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('recruiterId');
+    localStorage.removeItem('userType');
+    window.location.reload();
+  };
 
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading profile...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center text-red-500 mt-8">{error}</div>;
-  }
-
-  if (!userProfile) {
-    return <div className="text-center text-gray-500 mt-8">No user profile found.</div>;
-  }
+  if (loading) return <div className="flex justify-center items-center h-64 text-lg">Loading...</div>;
+  if (error) return <div className="flex justify-center items-center h-64 text-red-600">{error}</div>;
+  if (!student) return <div className="flex justify-center items-center h-64 text-gray-500">No student found.</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 flex flex-col">
-      <header className="bg-white shadow top-0 z-10 p-4 rounded-md flex justify-between items-center">
-        <div className="flex items-center">
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="mr-4 p-2 rounded-full hover:bg-gray-200"
-              title="Back to Applications"
-            >
-              <ArrowLeft size={24} />
-            </button>
-          )}
-          <h1 className="text-2xl font-bold text-gray-900">Applicant Profile: {userProfile.fullName}</h1>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center mb-6">
-              <img
-                className="h-24 w-24 rounded-full object-cover mr-6"
-                src={userProfile.profilePicture || `https://ui-avatars.com/api/?name=${userProfile.fullName}&background=random`}
-                alt={userProfile.fullName}
-              />
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">{userProfile.fullName}</h2>
-                <p className="text-gray-600">{userProfile.role}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center text-gray-700">
-                <Mail size={20} className="mr-2 text-gray-500" />
-                <span>{userProfile.email}</span>
-              </div>
-              {userProfile.phone && (
-                <div className="flex items-center text-gray-700">
-                  <Phone size={20} className="mr-2 text-gray-500" />
-                  <span>{userProfile.phone}</span>
-                </div>
-              )}
-              {userProfile.location && (
-                <div className="flex items-center text-gray-700">
-                  <MapPin size={20} className="mr-2 text-gray-500" />
-                  <span>{userProfile.location}</span>
-                </div>
-              )}
-              {userProfile.experience && (
-                <div className="flex items-center text-gray-700">
-                  <Briefcase size={20} className="mr-2 text-gray-500" />
-                  <span>{userProfile.experience} years of experience</span>
-                </div>
-              )}
-            </div>
-
-            {userProfile.skills && userProfile.skills.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {userProfile.skills.map((skill, index) => (
-                    <span key={index} className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {userProfile.education && userProfile.education.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
-                <ul className="list-disc list-inside space-y-2">
-                  {userProfile.education.map((edu, index) => (
-                    <li key={index} className="text-gray-700">
-                      <GraduationCap size={16} className="inline mr-2 text-gray-500" />
-                      {edu.degree} in {edu.fieldOfStudy} from {edu.institution} ({edu.startYear} - {edu.endYear})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {userProfile.appliedJobs && userProfile.appliedJobs.length > 0 && ( // Display applied jobs
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Applied Jobs</h3>
-                <ul className="list-disc list-inside space-y-2">
-                  {userProfile.appliedJobs.map((jobApp) => (
-                    <li key={jobApp._id} className="text-gray-700">
-                      <Briefcase size={16} className="inline mr-2 text-gray-500" />
-                      {jobApp.job?.title} at {jobApp.job?.companyName} (Status: {jobApp.status}) - Applied on {new Date(jobApp.appliedDate).toLocaleDateString()}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => onBack()}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-              >
-                Close Profile
-              </button>
-            </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+      {/* Header */}
+      <header className="flex justify-between items-center px-8 py-6 bg-white shadow-md">
+        <div className="flex items-center gap-4">
+          <FaUserCircle className="text-5xl text-blue-600" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{student.fullName}</h1>
+            <p className="text-gray-600">Student</p>
           </div>
         </div>
- </main>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-semibold text-lg"
+        >
+          <FaSignOutAlt /> Logout
+        </button>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          {/* User Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+              <h2 className="text-xl font-semibold mb-4 text-blue-700">Contact Information</h2>
+              <div className="flex items-center gap-3 mb-2 text-gray-700">
+                <FaEnvelope className="text-blue-400" />
+                <span>{student.email}</span>
+              </div>
+              {student.phone && (
+                <div className="flex items-center gap-3 mb-2 text-gray-700">
+                  <FaPhone className="text-blue-400" />
+                  <span>{student.phone}</span>
+                </div>
+              )}
+              {student.location && (
+                <div className="flex items-center gap-3 mb-2 text-gray-700">
+                  <FaMapMarkerAlt className="text-blue-400" />
+                  <span>{student.location}</span>
+                </div>
+              )}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-4 text-blue-700">Skills</h2>
+              <div className="flex flex-wrap gap-2">
+                {student.skills && student.skills.length > 0 ? (
+                  student.skills.map((skill, idx) => (
+                    <span key={idx} className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-gray-400">No skills added</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Education */}
+          {student.education && student.education.length > 0 && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 text-blue-700">Education</h2>
+              <ul className="space-y-2">
+                {student.education.map((edu, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-gray-700">
+                    <FaGraduationCap className="text-blue-400" />
+                    <span>{edu.degree} in {edu.fieldOfStudy} at {edu.institution} ({edu.startYear} - {edu.endYear})</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Applied Jobs */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-blue-700">Applied Jobs</h2>
+            {appliedJobs && appliedJobs.length > 0 ? (
+              <ul className="divide-y divide-gray-200">
+                {appliedJobs.map((app) => (
+                  <li key={app._id} className="py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex items-center gap-3">
+                      <FaBriefcase className="text-green-500" />
+                      <div>
+                        <div className="font-semibold text-gray-900">{app.job?.jobTitle || 'Job Title'}</div>
+                        <div className="text-gray-500 text-sm">{app.job?.companyName || 'Company'}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        {app.status || 'pending'}
+                      </span>
+                      <span className="text-gray-400 text-xs">Applied on {app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ''}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-gray-400">You haven't applied to any jobs yet.</div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+} 

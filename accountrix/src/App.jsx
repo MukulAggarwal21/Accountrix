@@ -5,6 +5,8 @@ import JobSearchInfoPage from './components/Student/JobSearch/JobSearchInfoPage'
 import BrandHiring from './components/Student/BrandHiring/BrandHiring';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useState, useEffect, createContext, useContext } from 'react';
+import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
 import Dashboard from './components/Recruiter/Dashboard/Landing';
 import ViewJobs from './components/Recruiter/Dashboard/ViewJobs';
@@ -21,6 +23,8 @@ import RecruiterProfile from './components/Recruiter/Dashboard/Profile/Recruiter
 import BlogPage from './components/Recruiter/Dashboard/Blog/Blog';
 import NotificationPage from './components/Recruiter/Dashboard/Notification/Notification';
 import CompanyCultureForm from './components/Recruiter/SignupInfo/components/CompanyCultureForm';
+import ApplicantProfile from './components/Student/ApplicantProfile';
+import JobApplicationsPage from './components/Recruiter/Dashboard/PostedJobs/JobApplicationsPage';
 
 // Auth Context
 const AuthContext = createContext();
@@ -95,22 +99,6 @@ function AuthProvider({ children }) {
   );
 }
 
-// Protected Route Component
-function ProtectedRoute({ children, allowedTypes }) {
-  const { isAuthenticated, userType } = useAuth();
-  const recruiterId = localStorage.getItem('recruiterId');
-  const userId = localStorage.getItem('userId');
-
-  if (allowedTypes.includes('recruiter') && recruiterId && userType === 'recruiter') {
-    return children;
-  }
-  if (allowedTypes.includes('student') && userId && userType === 'student') {
-    return children;
-  }
-  
-  return <Navigate to="/" replace />;
-}
-
 // Public Route Component - prevents authenticated users from accessing public routes
 function PublicRoute({ children }) {
   const { isAuthenticated, userType } = useAuth();
@@ -129,11 +117,11 @@ function PublicRoute({ children }) {
   // If not authenticated, show the public route
   return children;
 }
-
 function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* <Navbar /> */}
         <Routes>
           {/* Public Route - only accessible when not authenticated */}
           <Route path='/' element={
@@ -141,17 +129,13 @@ function App() {
               <Landing />
             </PublicRoute>
           } />
-          
           <Route path='/jobsearch' element={<JobSeach />} />
-          <Route path='/jobsearchinfopage' element={<JobSearchInfoPage />} />
-          
-          {/* Protected Routes */}
           <Route path='/brandhiring' element={
             <ProtectedRoute allowedTypes={['student']}>
               <BrandHiring />
             </ProtectedRoute>
           } />
-          
+          <Route path='/jobsearchinfopage' element={<JobSearchInfoPage />} />
           <Route path="/dashboard" element={
             <ProtectedRoute allowedTypes={['recruiter']}>
               <Dashboard />
@@ -162,57 +146,20 @@ function App() {
             <Route path="candidates" element={<Candidates />} />
             <Route path="analytics" element={<Analytics />} />
           </Route>
-          
-          <Route path="/testing" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <Testing />
+          <Route path="/testing" element={<Testing />} />
+          <Route path="/jobposting" element={<JobPosting />} />
+          <Route path="/recruitersetup" element={<RecruiterSetup />} />
+          <Route path="/joblist" element={<JobList />} />
+          <Route path="/allapplication" element={<AllApplication />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/company" element={<CompanyCultureForm />} />
+          <Route path='/profile' element={
+            <ProtectedRoute allowedTypes={['student']}>
+              <ApplicantProfile userId={localStorage.getItem('userId')} />
             </ProtectedRoute>
           } />
-          
-          <Route path="/jobposting" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <JobPosting />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/recruitersetup" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <RecruiterSetup />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/joblist" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <JobList />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/allapplication" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <AllApplication />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/blog" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <BlogPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/notification" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <NotificationPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/company" element={
-            <ProtectedRoute allowedTypes={['recruiter']}>
-              <CompanyCultureForm />
-            </ProtectedRoute>
-          } />
-
-          {/* Catch all route - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/job/:jobId/applications" element={<JobApplicationsPage />} />
         </Routes>
       </Router>
     </AuthProvider>

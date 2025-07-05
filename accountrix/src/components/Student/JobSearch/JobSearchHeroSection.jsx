@@ -49,6 +49,7 @@ const JobSearch = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white overflow-hidden ">
       {/* Background decorative elements */}
+      <Navbar/>
       <div className="absolute  top-20 left-10 w-64 h-64 bg-green-100 rounded-full filter blur-3xl opacity-30"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full filter blur-3xl opacity-30"></div>
 

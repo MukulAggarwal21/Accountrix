@@ -34,3 +34,22 @@ export const ensureCompanyId = async () => {
 export const getCompanyId = async () => {
   return await ensureCompanyId();
 };
+
+// --- Interview API Utilities ---
+
+export const scheduleInterview = async ({ candidate, job, recruiter, date, time }) => {
+  const response = await fetch('http://localhost:5000/interviews', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ candidate, job, recruiter, date, time })
+  });
+  if (!response.ok) throw new Error('Failed to schedule interview');
+  return await response.json();
+};
+
+export const getInterviewsByRecruiter = async (recruiterId) => {
+  const response = await fetch(`http://localhost:5000/interviews/byRecruiter/${recruiterId}`);
+  if (!response.ok) throw new Error('Failed to fetch interviews');
+  return await response.json();
+};
+

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+ import JobApplicationsPage from '../Dashboard/PostedJobs/JobApplicationsPage'
+
 import {
 
   BriefcaseBusiness,
@@ -10,7 +12,6 @@ import {
   X,
   User,
   Star,
-  LogOut,
 
 } from 'lucide-react';
 
@@ -28,7 +29,7 @@ import RecruiterBlogDashboard from './Blog/Blog';
 import axios from 'axios';
 // import { response } from 'express';
 
-export default function Dashboard({ onLogout }) {
+export default function Dashboard() {
   // const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -39,6 +40,8 @@ export default function Dashboard({ onLogout }) {
   const [company, setCompany] = useState(null);
   const companyId = localStorage.getItem('companyId');
   const recruiterId = localStorage.getItem('recruiterId');
+
+  const [selectedJobId, setSelectedJobId] = useState(null);
 
   // Function to fetch and set companyId if missing
   const fetchAndSetCompanyId = async () => {
@@ -65,19 +68,23 @@ export default function Dashboard({ onLogout }) {
     fetchAndSetCompanyId();
   }, []);
 
-  // Handle logout
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    } else {
-      // Fallback logout if onLogout prop is not provided
-      localStorage.removeItem('recruiterId');
-      localStorage.removeItem('companyId');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      window.location.href = '/';
+  // Fetch company data for display
+  useEffect(() => {
+    const recruiterId = localStorage.getItem('recruiterId');
+    if (recruiterId) {
+      axios.get(`http://localhost:5000/company/byRecruiter/${recruiterId}`)
+        .then(res => {
+          setCompany(res.data);
+          if (res.data && res.data._id) {
+            localStorage.setItem('companyId', res.data._id);
+          }
+        })
+        .catch(err => {
+          setCompany(null);
+          console.error('Error fetching company info:', err);
+        });
     }
-  };
+  }, []);
 
   const prevJobCountRef = useRef(0); // To keep previous jobs count
 
@@ -118,7 +125,11 @@ export default function Dashboard({ onLogout }) {
 
   // Sample data
   const stats = [
+    // { label: 'Active Jobs', value: jobs.length, change: '+3', positive: true },
+    // { label: 'Active Jobs', value: jobs.length, change: `+${change}`, positive: positive },
+    // { label: 'Active Jobs', value: jobs.length, change: (positive ? '+' : '-') + change, positive },
     { label: 'Active Jobs', value: jobs.length, change: (change !== null ? (positive ? '+' : '-') + change : ''), positive },
+
     { label: 'Total Applicants', value: '642', change: '+28', positive: true },
     { label: 'Interviews', value: '38', change: '-5', positive: false },
     { label: 'Hired', value: '12', change: '+2', positive: true },
@@ -160,6 +171,7 @@ export default function Dashboard({ onLogout }) {
             <X size={24} />
           </button>
         </div>
+
 
         <div className="flex-1 space-y-1 px-2 py-4">
           <div
@@ -226,39 +238,34 @@ export default function Dashboard({ onLogout }) {
           </div>
         </div>
 
+
         <div className="flex items-center border-t border-indigo-800 p-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white">
             <User size={16} />
           </div>
-          <div className="ml-3 flex-1">
+          <div className="ml-3">
             <p className="text-sm font-medium text-white">Alex Morgan</p>
             <p className="text-xs text-indigo-200">Senior Recruiter</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center justify-center p-2 text-indigo-200 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors"
-            title="Logout"
-          >
-            <LogOut size={16} />
-          </button>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-
         {/* Top Navigation */}
         <Navigation setSidebarOpen={setSidebarOpen} />
-
-        {/* Main Dashboard */}
-        {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
-        {step == 2 && <AllApplication />}
-        {step == 3 && <InterviewSchedule />}
-        {step == 4 && <ComingSoon />}
-        {step == 5 && <JobList companyId={companyId} />}
-        {step == 6 && <RecruiterBlogDashboard />}
-        {step == 7 && <RecruiterProfile  companyId={companyId} recruiterId={recruiterId}/>}
-        {step == 8 && <JobPosting setStep={setStep} step={step} />}
+        <div className="flex-1 overflow-y-auto">
+          {step == 1 && <MainDashboard upcomingInterviews={upcomingInterviews} stats={stats} recentApplications={recentApplications} setStep={setStep} />}
+          {step == 2 && <AllApplication />}
+          {step == 3 && <InterviewSchedule />}
+          {step == 4 && <ComingSoon />}
+          {/* {step == 5 && <JobList companyId={company?._id} />} */}
+          {step == 5 && <JobList companyId={companyId} setStep={setStep} step={step} selectedJobId={selectedJobId} setSelectedJobId={setSelectedJobId} />}
+          {step == 6 && <RecruiterBlogDashboard />}
+          {step == 7 && <RecruiterProfile  />}
+          {step == 8 && <JobPosting setStep={setStep} step={step} />}
+          {step== 9 && <JobApplicationsPage  jobId={selectedJobId} />}
+        </div>
       </div>
     </div>
   );

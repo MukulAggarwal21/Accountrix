@@ -2,8 +2,61 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash, Eye, Users, Plus, Search, X } from 'lucide-react';
 import axios from 'axios';
 import { ensureCompanyId } from '../../../../lib/utils';
+import { useNavigate } from 'react-router-dom';
 
-export default function JobList({ companyId: propCompanyId }) {
+function JobApplicationsModal({ jobId, onClose }) {
+  const [applications, setApplications] = useState([]);
+  useEffect(() => {
+    axios.get(`http://localhost:5000/applications/job/${jobId}`)
+      .then(res => setApplications(res.data))
+      .catch(err => setApplications([]));
+  }, [jobId]);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 relative overflow-y-auto max-h-[80vh]">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+        >×</button>
+        <h2 className="text-2xl font-bold mb-6 text-center">Job Applications</h2>
+        {applications.length === 0 ? (
+          <div className="text-center text-gray-500">No applications yet.</div>
+        ) : (
+          <div className="space-y-6">
+            {applications.map(app => (
+              <div key={app._id} className="border rounded-lg p-4 shadow-sm bg-gray-50">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-semibold text-lg">{app.applicant?.fullName || "Unknown"}</div>
+                    <div className="text-gray-500 text-sm">{app.applicant?.email}</div>
+                  </div>
+                  <a
+                    href={`/student-profile/${app.applicant?._id}`}
+                    className="text-blue-600 underline font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Profile
+                  </a>
+                </div>
+                <div className="mt-2">
+                  <span className="font-medium">Message:</span>
+                  <div className="bg-white border rounded p-2 mt-1 text-gray-700">{app.message || <span className="italic text-gray-400">No message</span>}</div>
+                </div>
+                <div className="text-xs text-gray-400 mt-2">
+                  Applied on: {app.timestamp ? new Date(app.timestamp).toLocaleString() : "Unknown"}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function JobList({ companyId: propCompanyId , setStep, step , selectedJobId ,setSelectedJobId  } ) {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingJob, setViewingJob] = useState(null);
@@ -12,14 +65,15 @@ export default function JobList({ companyId: propCompanyId }) {
   const [showAddJobModal, setShowAddJobModal] = useState(false);
   const [resolvedCompanyId, setResolvedCompanyId] = useState(propCompanyId);
   const recruiterId = localStorage.getItem('recruiterId');
-  const [jobApplicationCounts, setJobApplicationCounts] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [appCounts, setAppCounts] = useState({});
+const navigate = useNavigate();
 
   const [newJob, setNewJob] = useState({
     jobTitle: '',
     jobDescription: '',
     companyName: '',
     companyLocation: '',
+    jobLocation: '',
     website: '',
     companyDescription: '',
     skills: [],
@@ -57,19 +111,6 @@ export default function JobList({ companyId: propCompanyId }) {
             }
             
             setJobs(filteredJobs);
-
-            // Fetch application counts for each job
-            const counts = {};
-            for (const job of filteredJobs) {
-              try {
-                const applicationsResponse = await axios.get(`http://localhost:5000/applications/job/${job._id}`);
-                counts[job._id] = applicationsResponse.data.length;
-              } catch (error) {
-                console.error(`Error fetching applications for job ${job._id}:`, error);
-                counts[job._id] = 0;
-              }
-            }
-            setJobApplicationCounts(counts);
           } catch (error) {
             console.error('Error fetching jobs by recruiter:', error);
             
@@ -89,13 +130,29 @@ export default function JobList({ companyId: propCompanyId }) {
         }
       } catch (error) {
         console.error('Error fetching jobs:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchCompanyIdAndJobs();
   }, [propCompanyId, recruiterId]);
+
+  // Fetch applicant counts for each job
+  useEffect(() => {
+    if (!jobs || jobs.length === 0) return;
+    const fetchCounts = async () => {
+      const counts = {};
+      await Promise.all(jobs.map(async (job) => {
+        try {
+          const res = await axios.get(`http://localhost:5000/applications/job/${job._id}`);
+          counts[job._id] = res.data.length;
+        } catch {
+          counts[job._id] = 0;
+        }
+      }));
+      setAppCounts(counts);
+    };
+    fetchCounts();
+  }, [jobs]);
 
   // Filter jobs based on search term
   const filteredJobs = jobs.filter(job =>
@@ -267,7 +324,9 @@ export default function JobList({ companyId: propCompanyId }) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-gray-600">
                       <Users className="mr-2" size={16} />
-                      <span className="text-sm">{jobApplicationCounts[job._id] || 0} Applicants</span>
+                      <span className="text-sm font-semibold">
+                        {appCounts[job._id] || 0} Applicants
+                      </span>
                     </div>
                     <span className="text-xs text-gray-500">{job.postedDate ? new Date(job.postedDate).toLocaleDateString() : 'Recently'}</span>
                   </div>
@@ -296,6 +355,17 @@ export default function JobList({ companyId: propCompanyId }) {
                     </div>
                   </div>
                 </div>
+
+                <button
+                 onClick={() => {
+                  setSelectedJobId(job._id); // set the selected job ID
+                  setStep(9);                // go to applications page
+                }}
+                  // onClick={() => navigate(`/job/${job._id}/applications`)}
+                  className="text-blue-600 underline text-sm mt-2"
+                >
+                  View Applications
+                </button>
               </div>
             </div>
           ))}
@@ -314,7 +384,7 @@ export default function JobList({ companyId: propCompanyId }) {
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-bold text-gray-900">{viewingJob.title || viewingJob.jobTitle}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{viewingJob.jobTitle}</h2>
                 <button
                   onClick={() => setViewingJob(null)}
                   className="text-gray-500 hover:text-gray-700"
@@ -326,7 +396,7 @@ export default function JobList({ companyId: propCompanyId }) {
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{viewingJob.jobLocation}</span>
                 <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                  {viewingJob.salary?.currency || ''} {viewingJob.salary?.amount || viewingJob.salary || ''}
+                  {viewingJob.salary?.currency || ''} {viewingJob.salary?.amount || ''}
                 </span>
                 <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">{viewingJob.status || 'Active'}</span>
                 <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">{viewingJob.workPolicy || 'Remote'}</span>
@@ -335,7 +405,7 @@ export default function JobList({ companyId: propCompanyId }) {
 
               <div className="mb-4">
                 <h3 className="font-medium text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-700">{viewingJob.description || viewingJob.jobDescription}</p>
+                <p className="text-gray-700">{viewingJob.jobDescription}</p>
               </div>
 
               {viewingJob.skills && viewingJob.skills.length > 0 && (
@@ -353,9 +423,9 @@ export default function JobList({ companyId: propCompanyId }) {
 
               <div className="flex items-center text-gray-600 mb-4">
                 <Users className="mr-2" size={18} />
-                <span>{jobApplicationCounts[viewingJob._id] || 0} Applicants</span>
+                <span>{viewingJob.applicants || 0} Applicants</span>
                 <span className="mx-2">•</span>
-                <span>Posted {viewingJob.postedDate || 'Recently'}</span>
+                <span>Posted {viewingJob.postedDate ? new Date(viewingJob.postedDate).toLocaleDateString() : 'Recently'}</span>
               </div>
 
               <div className="flex justify-end space-x-2 mt-6">
@@ -400,8 +470,8 @@ export default function JobList({ companyId: propCompanyId }) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
                   <input
                     type="text"
-                    value={editingJob.title || editingJob.jobTitle}
-                    onChange={(e) => setEditingJob({ ...editingJob, title: e.target.value, jobTitle: e.target.value })}
+                    value={editingJob.jobTitle}
+                    onChange={(e) => setEditingJob({ ...editingJob, jobTitle: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -409,8 +479,8 @@ export default function JobList({ companyId: propCompanyId }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea
-                    value={editingJob.description || editingJob.jobDescription}
-                    onChange={(e) => setEditingJob({ ...editingJob, description: e.target.value, jobDescription: e.target.value })}
+                    value={editingJob.jobDescription}
+                    onChange={(e) => setEditingJob({ ...editingJob, jobDescription: e.target.value })}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
@@ -420,8 +490,8 @@ export default function JobList({ companyId: propCompanyId }) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
                   <input
                     type="text"
-                    value={editingJob.location}
-                    onChange={(e) => setEditingJob({ ...editingJob, location: e.target.value })}
+                    value={editingJob.jobLocation}
+                    onChange={(e) => setEditingJob({ ...editingJob, jobLocation: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -560,8 +630,8 @@ export default function JobList({ companyId: propCompanyId }) {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Job Title*</label>
                       <input
                         type="text"
-                        value={newJob.title}
-                        onChange={(e) => setNewJob({ ...newJob, title: e.target.value })}
+                        value={newJob.jobTitle}
+                        onChange={(e) => setNewJob({ ...newJob, jobTitle: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. Senior Developer"
                         required
@@ -572,8 +642,8 @@ export default function JobList({ companyId: propCompanyId }) {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Location*</label>
                       <input
                         type="text"
-                        value={newJob.location}
-                        onChange={(e) => setNewJob({ ...newJob, location: e.target.value })}
+                        value={newJob.jobLocation}
+                        onChange={(e) => setNewJob({ ...newJob, jobLocation: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g. Remote, Bangalore, etc."
                         required
@@ -584,8 +654,8 @@ export default function JobList({ companyId: propCompanyId }) {
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Job Description*</label>
                     <textarea
-                      value={newJob.description}
-                      onChange={(e) => setNewJob({ ...newJob, description: e.target.value })}
+                      value={newJob.jobDescription}
+                      onChange={(e) => setNewJob({ ...newJob, jobDescription: e.target.value })}
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter detailed job description..."
@@ -752,8 +822,8 @@ export default function JobList({ companyId: propCompanyId }) {
                 </button>
                 <button
                   onClick={handleAddJob}
-                  disabled={!newJob.title || !newJob.description || !newJob.companyName || !newJob.location || !newJob.website || !newJob.companyDescription || !newJob.salary.amount}
-                  className={`px-4 py-2 rounded-md ${!newJob.title || !newJob.description || !newJob.companyName || !newJob.location || !newJob.website || !newJob.companyDescription || !newJob.salary.amount ?
+                  disabled={!newJob.jobTitle || !newJob.jobDescription || !newJob.companyName || !newJob.jobLocation || !newJob.website || !newJob.companyDescription || !newJob.salary.amount}
+                  className={`px-4 py-2 rounded-md ${!newJob.jobTitle || !newJob.jobDescription || !newJob.companyName || !newJob.jobLocation || !newJob.website || !newJob.companyDescription || !newJob.salary.amount ?
                     'bg-blue-300 cursor-not-allowed' :
                     'bg-blue-600 hover:bg-blue-700'
                     } text-white`}
