@@ -7,16 +7,24 @@ export function cn(...inputs) {
 
 // Utility function to ensure companyId is available in localStorage
 export const ensureCompanyId = async () => {
-  const currentCompanyId = localStorage.getItem('companyId');
+  let currentCompanyId = localStorage.getItem('companyId');
   const currentRecruiterId = localStorage.getItem('recruiterId');
-  
+
+  // Validate companyId format (24 hex chars)
+  const isValidObjectId = id => typeof id === 'string' && id.length === 24 && /^[a-fA-F0-9]+$/.test(id);
+
+  if (!isValidObjectId(currentCompanyId)) {
+    // Remove invalid companyId
+    localStorage.removeItem('companyId');
+    currentCompanyId = null;
+  }
   // If companyId is missing but recruiterId exists, fetch company data
   if (!currentCompanyId && currentRecruiterId) {
     try {
       const response = await fetch(`http://localhost:5000/company/byRecruiter/${currentRecruiterId}`);
       if (response.ok) {
         const data = await response.json();
-        if (data && data._id) {
+        if (data && data._id && isValidObjectId(data._id)) {
           localStorage.setItem('companyId', data._id);
           console.log('CompanyId fetched and set:', data._id);
           return data._id;
@@ -26,7 +34,6 @@ export const ensureCompanyId = async () => {
       console.error('Error fetching company data:', error);
     }
   }
-  
   return currentCompanyId;
 };
 

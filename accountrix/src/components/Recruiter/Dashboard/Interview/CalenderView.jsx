@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Calendar,
   Search,
@@ -23,6 +24,27 @@ const CalendarView = ({ interviews = [], onClickInterview = () => {} }) => {
   const [viewMode, setViewMode] = useState('month'); // month, week, day
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [todaysInterviews, setTodaysInterviews] = useState([]);
+  const [loadingToday, setLoadingToday] = useState(true);
+
+  // Fetch today's interviews
+  useEffect(() => {
+    const fetchTodaysInterviews = async () => {
+      try {
+        const recruiterId = localStorage.getItem('recruiterId');
+        if (!recruiterId) return;
+
+        const response = await axios.get(`http://localhost:5000/dashboard/today-interviews/${recruiterId}`);
+        setTodaysInterviews(response.data);
+        setLoadingToday(false);
+      } catch (error) {
+        console.error('Error fetching today\'s interviews:', error);
+        setLoadingToday(false);
+      }
+    };
+
+    fetchTodaysInterviews();
+  }, []);
 
   // Get current year and month for dynamic dates
   const currentYear = currentDate.getFullYear();
@@ -256,230 +278,223 @@ const CalendarView = ({ interviews = [], onClickInterview = () => {} }) => {
   const selectedDateInterviews = selectedDate ? getInterviewsForDate(selectedDate) : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold text-slate-800">Interview Calendar</h1>
-                  <p className="text-sm text-slate-500">Manage your interview schedule</p>
-                </div>
-              </div>
-              
-              {/* Month Navigation */}
-              <div className="flex items-center space-x-4 bg-white/60 rounded-xl px-4 py-2 border border-white/40">
-                <button 
-                  onClick={() => navigateMonth(-1)}
-                  className="p-1 hover:bg-white/80 rounded-lg transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4 text-slate-600" />
-                </button>
-                <span className="text-lg font-medium text-slate-800 min-w-[140px] text-center">
-                  {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-                </span>
-                <button 
-                  onClick={() => navigateMonth(1)}
-                  className="p-1 hover:bg-white/80 rounded-lg transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4 text-slate-600" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search interviews..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-64 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:bg-white/80 transition-all placeholder-slate-400"
-                />
-              </div>
-              
-              <button className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/25">
-                <Plus className="w-4 h-4" />
-                <span>Schedule</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Calendar */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/40 overflow-hidden shadow-xl shadow-slate-200/50">
-          
-          {/* Week Days Header */}
-          <div className="grid grid-cols-7 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200/50">
-            {weekDays.map((day) => (
-              <div key={day} className="p-4 text-center">
-                <span className="text-sm font-medium text-slate-600">{day}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7">
-            {getDaysInMonth(currentDate).map((date, index) => {
-              const dayInterviews = getInterviewsForDate(date);
-              const isCurrentDay = isToday(date);
-              const isInCurrentMonth = isCurrentMonth(date);
-              
-              return (
-                <div
-                  key={index}
-                  onClick={() => handleDateClick(date, dayInterviews)}
-                  className={`min-h-32 p-2 border-r border-b border-slate-200/30 transition-all hover:bg-white/40 ${
-                    !isInCurrentMonth ? 'bg-slate-50/30' : 'bg-white/20'
-                  } ${isCurrentDay ? 'bg-blue-50/60 ring-2 ring-blue-500/20' : ''} ${
-                    dayInterviews.length > 0 ? 'cursor-pointer hover:bg-blue-50/40' : ''
-                  }`}
-                >
-                  {date && (
-                    <>
-                      {/* Date Number */}
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`text-sm font-medium ${
-                          isCurrentDay 
-                            ? 'w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs' 
-                            : isInCurrentMonth 
-                              ? 'text-slate-700' 
-                              : 'text-slate-400'
-                        }`}>
-                          {date.getDate()}
-                        </span>
-                        {dayInterviews.length > 0 && (
-                          <span className="w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
-                            {dayInterviews.length}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Interviews Preview or Count */}
-                      <div className="space-y-1">
-                        {dayInterviews.length === 1 ? (
-                          // Show single interview preview
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onClickInterview(dayInterviews[0]);
-                            }}
-                            className="group cursor-pointer"
-                          >
-                            <div className={`p-2 rounded-lg border transition-all hover:shadow-md ${getStatusColor(dayInterviews[0].status)} hover:scale-105`}>
-                              <div className="flex items-center space-x-2 mb-1">
-                                <div className={`w-2 h-2 rounded-full ${getPriorityColor(dayInterviews[0].priority)}`}></div>
-                                <span className="text-xs font-medium truncate">{dayInterviews[0].candidate.fullName}</span>
-                              </div>
-                              
-                              <div className="flex items-center justify-between text-xs">
-                                <div className="flex items-center space-x-1">
-                                  <Clock className="w-3 h-3" />
-                                  <span>{dayInterviews[0].time}</span>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  {dayInterviews[0].type === 'video' ? (
-                                    <Video className="w-3 h-3" />
-                                  ) : dayInterviews[0].type === 'phone' ? (
-                                    <Phone className="w-3 h-3" />
-                                  ) : (
-                                    <MapPin className="w-3 h-3" />
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div className="text-xs text-current/70 mt-1 truncate">
-                                {dayInterviews[0].candidate.role}
-                              </div>
-                            </div>
-                          </div>
-                        ) : dayInterviews.length > 1 ? (
-                          // Show count badge for multiple interviews
-                          <div className="text-center py-4">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-110">
-                              {dayInterviews.length}
-                            </div>
-                            <p className="text-xs text-slate-600 mt-2 font-medium">interviews</p>
-                          </div>
-                        ) : null}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Today's Schedule Sidebar */}
-        <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/40 p-6 shadow-xl shadow-slate-200/50">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-slate-800">Today's Schedule</h3>
-            <div className="flex items-center space-x-2">
-              <Bell className="w-4 h-4 text-slate-500" />
-              <span className="text-sm text-slate-500">
-                {sampleInterviews.filter(interview => {
-                  const today = new Date();
-                  const interviewDate = new Date(interview.date);
-                  return interviewDate.toDateString() === today.toDateString();
-                }).length} interviews today
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {sampleInterviews
-              .filter(interview => {
-                const today = new Date();
-                const interviewDate = new Date(interview.date);
-                return interviewDate.toDateString() === today.toDateString();
-              })
-              .map((interview) => (
-              <div
-                key={interview._id}
-                onClick={() => onClickInterview(interview)}
-                className="flex items-center space-x-4 p-4 bg-white/60 rounded-xl border border-white/40 hover:bg-white/80 cursor-pointer transition-all hover:shadow-lg"
-              >
-                <div className="text-center min-w-[60px]">
-                  <div className="text-lg font-semibold text-slate-800">{interview.time}</div>
-                  <div className="text-xs text-slate-500">{interview.duration}min</div>
-                </div>
-
-                <div className={`w-1 h-12 rounded-full ${getPriorityColor(interview.priority)}`}></div>
-
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h4 className="font-medium text-slate-800">{interview.candidate.fullName}</h4>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(interview.status)}`}>
-                      {interview.status}
-                    </span>
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        {/* Header */}
+        <div className="bg-white/80 backdrop-blur-sm border-b border-white/20 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  <p className="text-sm text-slate-600">{interview.candidate.role}</p>
-                  <p className="text-xs text-slate-500">{interview.stage}</p>
+                  <div>
+                    <h1 className="text-xl font-semibold text-slate-800">Interview Calendar</h1>
+                    <p className="text-sm text-slate-500">Manage your interview schedule</p>
+                  </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  {interview.type === 'video' ? (
-                    <Video className="w-4 h-4 text-blue-500" />
-                  ) : (
-                    <Phone className="w-4 h-4 text-green-500" />
-                  )}
-                  <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                
+                {/* Month Navigation */}
+                <div className="flex items-center space-x-4 bg-white/60 rounded-xl px-4 py-2 border border-white/40">
+                  <button 
+                    onClick={() => navigateMonth(-1)}
+                    className="p-1 hover:bg-white/80 rounded-lg transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-slate-600" />
+                  </button>
+                  <span className="text-lg font-medium text-slate-800 min-w-[140px] text-center">
+                    {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                  </span>
+                  <button 
+                    onClick={() => navigateMonth(1)}
+                    className="p-1 hover:bg-white/80 rounded-lg transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4 text-slate-600" />
+                  </button>
                 </div>
               </div>
-            ))}
+
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search interviews..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 w-64 bg-white/60 border border-white/40 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:bg-white/80 transition-all placeholder-slate-400"
+                  />
+                </div>
+                
+                <button className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/25">
+                  <Plus className="w-4 h-4" />
+                  <span>Schedule</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Calendar */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/40 overflow-hidden shadow-xl shadow-slate-200/50">
+            
+            {/* Week Days Header */}
+            <div className="grid grid-cols-7 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200/50">
+              {weekDays.map((day) => (
+                <div key={day} className="p-4 text-center">
+                  <span className="text-sm font-medium text-slate-600">{day}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7">
+              {getDaysInMonth(currentDate).map((date, index) => {
+                const dayInterviews = getInterviewsForDate(date);
+                const isCurrentDay = isToday(date);
+                const isInCurrentMonth = isCurrentMonth(date);
+                
+                return (
+                  <div
+                    key={index}
+                    onClick={() => handleDateClick(date, dayInterviews)}
+                    className={`min-h-32 p-2 border-r border-b border-slate-200/30 transition-all hover:bg-white/40 ${
+                      !isInCurrentMonth ? 'bg-slate-50/30' : 'bg-white/20'
+                    } ${isCurrentDay ? 'bg-blue-50/60 ring-2 ring-blue-500/20' : ''} ${
+                      dayInterviews.length > 0 ? 'cursor-pointer hover:bg-blue-50/40' : ''
+                    }`}
+                  >
+                    {date && (
+                      <>
+                        {/* Date Number */}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-sm font-medium ${
+                            isCurrentDay 
+                              ? 'w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs' 
+                              : isInCurrentMonth 
+                                ? 'text-slate-700' 
+                                : 'text-slate-400'
+                          }`}>
+                            {date.getDate()}
+                          </span>
+                          {dayInterviews.length > 0 && (
+                            <span className="w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+                              {dayInterviews.length}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Interviews Preview or Count */}
+                        <div className="space-y-1">
+                          {dayInterviews.length === 1 ? (
+                            // Show single interview preview
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onClickInterview(dayInterviews[0]);
+                              }}
+                              className="group cursor-pointer"
+                            >
+                              <div className={`p-2 rounded-lg border transition-all hover:shadow-md ${getStatusColor(dayInterviews[0].status)} hover:scale-105`}>
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <div className={`w-2 h-2 rounded-full ${getPriorityColor(dayInterviews[0].priority)}`}></div>
+                                  <span className="text-xs font-medium truncate">{dayInterviews[0].candidate.fullName}</span>
+                                </div>
+                                
+                                <div className="flex items-center justify-between text-xs">
+                                  <div className="flex items-center space-x-1">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{dayInterviews[0].time}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    {dayInterviews[0].type === 'video' ? (
+                                      <Video className="w-3 h-3" />
+                                    ) : dayInterviews[0].type === 'phone' ? (
+                                      <Phone className="w-3 h-3" />
+                                    ) : (
+                                      <MapPin className="w-3 h-3" />
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="text-xs text-current/70 mt-1 truncate">
+                                  {dayInterviews[0].candidate.role}
+                                </div>
+                              </div>
+                            </div>
+                          ) : dayInterviews.length > 1 ? (
+                            // Show count badge for multiple interviews
+                            <div className="text-center py-4">
+                              <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-110">
+                                {dayInterviews.length}
+                              </div>
+                              <p className="text-xs text-slate-600 mt-2 font-medium">interviews</p>
+                            </div>
+                          ) : null}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Today's Schedule Sidebar */}
+          <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/40 p-6 shadow-xl shadow-slate-200/50">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-slate-800">Today's Schedule</h3>
+              <div className="flex items-center space-x-2">
+                <Bell className="w-4 h-4 text-slate-500" />
+                <span className="text-sm text-slate-500">
+                  {loadingToday ? 'Loading...' : `${todaysInterviews.length} interviews today`}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {loadingToday ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="text-sm text-slate-500 mt-2">Loading today's interviews...</p>
+                </div>
+              ) : todaysInterviews.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-slate-500">No interviews scheduled for today</p>
+                </div>
+              ) : (
+                todaysInterviews.map((interview) => (
+                  <div
+                    key={interview._id}
+                    onClick={() => onClickInterview(interview)}
+                    className="flex items-center space-x-4 p-4 bg-white/60 rounded-xl border border-white/40 hover:bg-white/80 cursor-pointer transition-all hover:shadow-lg"
+                  >
+                    <div className="text-center min-w-[60px]">
+                      <div className="text-lg font-semibold text-slate-800">{interview.time}</div>
+                      <div className="text-xs text-slate-500">60min</div>
+                    </div>
+                    <div className="w-1 h-12 rounded-full bg-blue-500"></div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <h4 className="font-medium text-slate-800">{interview.candidate?.fullName || 'Unknown Candidate'}</h4>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(interview.status)}`}>{interview.status}</span>
+                      </div>
+                      <p className="text-sm text-slate-600">{interview.job?.jobTitle || 'Unknown Position'}</p>
+                      <p className="text-xs text-slate-500">Technical Interview</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Video className="w-4 h-4 text-blue-500" />
+                      <MoreHorizontal className="w-4 h-4 text-slate-400" />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
-
       {/* Interview Details Modal */}
       {showModal && selectedDate && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -587,7 +602,7 @@ const CalendarView = ({ interviews = [], onClickInterview = () => {} }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -1,10 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Eye, Calendar, Mail, User, MessageSquare } from 'lucide-react';
+import { Eye, Calendar, Mail, User, MessageSquare, ArrowLeft } from 'lucide-react';
 import { scheduleInterview } from '../../../../lib/utils';
 
-export default function JobApplicationsPage({ jobId: propJobId }) {
+export default function JobApplicationsPage({ jobId: propJobId, setStep }) {
   const params = useParams();
   const jobId = propJobId || params.jobId;
   const [applications, setApplications] = useState([]);
@@ -116,6 +116,17 @@ export default function JobApplicationsPage({ jobId: propJobId }) {
   return (
     <div className="w-full bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => setStep(5)}
+            className="flex items-center text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+          >
+            <ArrowLeft size={20} className="mr-2" />
+            Back to Jobs
+          </button>
+        </div>
+        
         {/* Header Section */}
         {job && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">

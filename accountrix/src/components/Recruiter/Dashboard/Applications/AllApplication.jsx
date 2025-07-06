@@ -351,7 +351,7 @@ export default function AllApplication() {
 
       </main>
 
-      <style jsx>{`
+      <style>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }

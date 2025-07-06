@@ -10,6 +10,24 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
   const [activeTab, setActiveTab] = useState('profile');
   const [companyData, setCompanyData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activity, setActivity] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(false);
+  const [activityError, setActivityError] = useState(null);
+  // Settings state
+  const [settings, setSettings] = useState({
+    notificationPreferences: {
+      newApplications: true,
+      newMessages: true,
+      marketUpdates: false
+    },
+    privacySettings: {
+      profileVisibility: true,
+      analyticsConsent: true
+    }
+  });
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsError, setSettingsError] = useState(null);
+  const [settingsSuccess, setSettingsSuccess] = useState(null);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -49,6 +67,65 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
     fetchCompanyData();
   }, [companyId, recruiterId]);
 
+  // Fetch real recruiter activity
+  useEffect(() => {
+    if (!recruiterId) return;
+    setActivityLoading(true);
+    setActivityError(null);
+    axios.get(`http://localhost:5000/dashboard/activity/${recruiterId}`)
+      .then(res => {
+        setActivity(res.data.activity || []);
+      })
+      .catch(err => {
+        setActivityError('Failed to load activity');
+      })
+      .finally(() => setActivityLoading(false));
+  }, [recruiterId]);
+
+  // Fetch initial settings
+  useEffect(() => {
+    if (!recruiterId) return;
+    setSettingsLoading(true);
+    setSettingsError(null);
+    axios.get(`http://localhost:5000/user/${recruiterId}`)
+      .then(res => {
+        setSettings({
+          notificationPreferences: res.data.notificationPreferences || settings.notificationPreferences,
+          privacySettings: res.data.privacySettings || settings.privacySettings
+        });
+      })
+      .catch(() => setSettingsError('Failed to load settings'))
+      .finally(() => setSettingsLoading(false));
+  }, [recruiterId]);
+
+  // Handle settings change
+  const handleSettingsChange = (section, key, value) => {
+    setSettings(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: value
+      }
+    }));
+  };
+
+  // Save settings
+  const saveSettings = () => {
+    setSettingsLoading(true);
+    setSettingsError(null);
+    setSettingsSuccess(null);
+    axios.patch(`http://localhost:5000/user/${recruiterId}/settings`, settings)
+      .then(() => {
+        setSettingsSuccess('Settings updated successfully');
+        toast.success('Settings updated successfully');
+      })
+      .catch(() => {
+        setSettingsError('Failed to update settings');
+        toast.error('Failed to update settings');
+      })
+      .finally(() => setSettingsLoading(false));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -86,6 +163,22 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
       }, 2000);
     } catch (error) {
       toast.error("Failed to delete company: " + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.get('http://localhost:5000/user/logout', { withCredentials: true });
+      // Clear local storage
+      localStorage.removeItem('recruiterId');
+      localStorage.removeItem('companyId');
+      localStorage.removeItem('userRole');
+      // Redirect to login page
+      window.location.href = '/';
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error("Failed to logout. Please try again.");
     }
   };
   // Sample data - in a real app this would come from API/props
@@ -273,36 +366,44 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
               <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
             </div>
             <div className="p-6">
-              <div className="flow-root">
-                <ul className="divide-y divide-gray-200">
-                  {profileData.activity.map((item, index) => (
-                    <li key={index} className="py-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            {item.action.includes("Posted") && <Briefcase size={20} className="text-blue-600" />}
-                            {item.action.includes("Reviewed") && <Users size={20} className="text-blue-600" />}
-                            {item.action.includes("Scheduled") && <Calendar size={20} className="text-blue-600" />}
-                            {item.action.includes("Updated") && <Edit size={20} className="text-blue-600" />}
+              {activityLoading ? (
+                <div className="text-gray-500">Loading activity...</div>
+              ) : activityError ? (
+                <div className="text-red-500">{activityError}</div>
+              ) : (
+                <div className="flow-root">
+                  <ul className="divide-y divide-gray-200">
+                    {activity.length === 0 ? (
+                      <li className="py-4 text-gray-500">No activity found.</li>
+                    ) : activity.map((item, index) => (
+                      <li key={index} className="py-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                              {item.type === 'job_posted' && <Briefcase size={20} className="text-blue-600" />}
+                              {item.type === 'application_reviewed' && <Users size={20} className="text-blue-600" />}
+                              {item.type === 'interview_scheduled' && <Calendar size={20} className="text-blue-600" />}
+                              {item.type === 'hire_made' && <Check size={20} className="text-green-600" />}
+                            </div>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {item.title}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {item.details}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0 whitespace-nowrap text-sm text-gray-500 flex items-center">
+                            <Clock size={14} className="mr-1" />
+                            {new Date(item.date).toLocaleString()}
                           </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {item.action}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {item.details}
-                          </p>
-                        </div>
-                        <div className="flex-shrink-0 whitespace-nowrap text-sm text-gray-500 flex items-center">
-                          <Clock size={14} className="mr-1" />
-                          {item.time}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="mt-6 text-center">
                 <button className="text-blue-600 hover:text-blue-700 font-medium">
                   View All Activity
@@ -327,7 +428,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                       <div className="mt-4 space-y-4">
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
-                            <input id="new-applications" name="new-applications" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
+                            <input id="new-applications" name="new-applications" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" checked={settings.notificationPreferences.newApplications} onChange={e => handleSettingsChange('notificationPreferences', 'newApplications', e.target.checked)} />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="new-applications" className="font-medium text-gray-700">New applications</label>
@@ -336,7 +437,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                         </div>
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
-                            <input id="new-messages" name="new-messages" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
+                            <input id="new-messages" name="new-messages" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" checked={settings.notificationPreferences.newMessages} onChange={e => handleSettingsChange('notificationPreferences', 'newMessages', e.target.checked)} />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="new-messages" className="font-medium text-gray-700">New messages</label>
@@ -345,7 +446,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                         </div>
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
-                            <input id="market-updates" name="market-updates" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
+                            <input id="market-updates" name="market-updates" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" checked={settings.notificationPreferences.marketUpdates} onChange={e => handleSettingsChange('notificationPreferences', 'marketUpdates', e.target.checked)} />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="market-updates" className="font-medium text-gray-700">Market updates</label>
@@ -360,7 +461,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                       <div className="mt-4 space-y-4">
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
-                            <input id="profile-visibility" name="profile-visibility" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
+                            <input id="profile-visibility" name="profile-visibility" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" checked={settings.privacySettings.profileVisibility} onChange={e => handleSettingsChange('privacySettings', 'profileVisibility', e.target.checked)} />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="profile-visibility" className="font-medium text-gray-700">Public company profile</label>
@@ -369,7 +470,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                         </div>
                         <div className="flex items-start">
                           <div className="flex items-center h-5">
-                            <input id="analytics-consent" name="analytics-consent" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" defaultChecked />
+                            <input id="analytics-consent" name="analytics-consent" type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" checked={settings.privacySettings.analyticsConsent} onChange={e => handleSettingsChange('privacySettings', 'analyticsConsent', e.target.checked)} />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="analytics-consent" className="font-medium text-gray-700">Analytics consent</label>
@@ -377,6 +478,13 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                           </div>
                         </div>
                       </div>
+                    </div>
+                    <div className="pt-5">
+                      <button onClick={saveSettings} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" disabled={settingsLoading}>
+                        {settingsLoading ? 'Saving...' : 'Save Settings'}
+                      </button>
+                      {settingsError && <div className="text-red-500 mt-2">{settingsError}</div>}
+                      {settingsSuccess && <div className="text-green-600 mt-2">{settingsSuccess}</div>}
                     </div>
                   </div>
                 </div>
@@ -400,12 +508,19 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
                   </div>
 
 
-                  <div onClick={handleDeleteCompany}
-
-                    className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="mt-6 pt-6 border-t border-gray-200">
                     <ToastContainer />
                     <h3 className="text-sm font-medium text-gray-900 mb-4">Account Actions</h3>
-                    <button className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-left">
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-left mb-3"
+                    >
+                      Logout
+                    </button>
+                    <button 
+                      onClick={handleDeleteCompany}
+                      className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-left"
+                    >
                       Delete Account
                     </button>
                   </div>

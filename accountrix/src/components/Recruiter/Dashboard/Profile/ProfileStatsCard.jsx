@@ -8,7 +8,16 @@ export default function ProfileStatsCard({profileData , companyId , recruiterId}
 
    const job = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/jobs/byCompanyAndRecruiter/${companyId}/${recruiterId}`);
+      // Get IDs from props or localStorage
+      const currentCompanyId = companyId || localStorage.getItem('companyId');
+      const currentRecruiterId = recruiterId || localStorage.getItem('recruiterId');
+      
+      if (!currentCompanyId || !currentRecruiterId) {
+        console.log('Missing companyId or recruiterId');
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:5000/jobs/byCompanyAndRecruiter/${currentCompanyId}/${currentRecruiterId}`);
       const currentJobs = response.data;
 
       setJobs(currentJobs);
@@ -25,7 +34,7 @@ export default function ProfileStatsCard({profileData , companyId , recruiterId}
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [companyId, recruiterId]);
 
 
 
