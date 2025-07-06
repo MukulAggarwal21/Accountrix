@@ -5,6 +5,7 @@ import ProfileStatsCard from './ProfileStatsCard';
 import MainContent from './MainContent';
 import { ToastContainer, toast } from 'react-toastify';
 import { ensureCompanyId } from '../../../../lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 export default function RecruiterProfile({ companyId, recruiterId }) {
   const [activeTab, setActiveTab] = useState('profile');
@@ -28,6 +29,10 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [settingsError, setSettingsError] = useState(null);
   const [settingsSuccess, setSettingsSuccess] = useState(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState(null);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -124,6 +129,32 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
         toast.error('Failed to update settings');
       })
       .finally(() => setSettingsLoading(false));
+  };
+
+  // Open edit modal with current company data
+  const openEditProfile = () => {
+    setEditData({ ...companyData });
+    setEditOpen(true);
+  };
+  // Handle field change
+  const handleEditChange = (field, value) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
+  };
+  // Save profile edits
+  const saveEditProfile = async () => {
+    setEditLoading(true);
+    setEditError(null);
+    try {
+      const res = await axios.patch(`http://localhost:5000/company/${companyData._id}`, editData);
+      setCompanyData(res.data.company);
+      setEditOpen(false);
+      toast.success('Profile updated successfully!');
+    } catch (err) {
+      setEditError(err.response?.data?.message || 'Failed to update profile');
+      toast.error('Failed to update profile');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   if (loading) {
@@ -238,7 +269,7 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
               <p className="text-gray-600">{companyData.pitch}</p>
             </div>
             <div className="mt-4 md:mt-0">
-              <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onClick={openEditProfile}>
                 <Edit size={18} className="mr-2" />
                 Edit Profile
               </button>
@@ -530,6 +561,66 @@ export default function RecruiterProfile({ companyId, recruiterId }) {
           </div>
         )}
       </div>
+      {/* Edit Profile Modal */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          {editError && <div className="text-red-500 mb-2">{editError}</div>}
+          {editData && (
+            <form onSubmit={e => { e.preventDefault(); saveEditProfile(); }} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Company Name</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.companyName || ''} onChange={e => handleEditChange('companyName', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Work Email</label>
+                  <input type="email" className="mt-1 block w-full border rounded p-2" value={editData.workEmail || ''} onChange={e => handleEditChange('workEmail', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Website</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.website || ''} onChange={e => handleEditChange('website', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.location || ''} onChange={e => handleEditChange('location', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.name || ''} onChange={e => handleEditChange('name', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.phone || ''} onChange={e => handleEditChange('phone', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.role || ''} onChange={e => handleEditChange('role', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Market</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.market || ''} onChange={e => handleEditChange('market', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Employee Count</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.employeeCount || ''} onChange={e => handleEditChange('employeeCount', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Pitch</label>
+                  <input type="text" className="mt-1 block w-full border rounded p-2" value={editData.pitch || ''} onChange={e => handleEditChange('pitch', e.target.value)} />
+                </div>
+              </div>
+              {/* Add more fields as needed */}
+              <DialogFooter>
+                <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={() => setEditOpen(false)} disabled={editLoading}>Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded" disabled={editLoading}>{editLoading ? 'Saving...' : 'Save Changes'}</button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div >
   );
 }
