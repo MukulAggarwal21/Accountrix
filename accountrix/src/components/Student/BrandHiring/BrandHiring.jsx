@@ -1,8 +1,8 @@
-
 import React from "react";
 import brandHiringImage from '../../../assets/images/brandhiring.png';
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Navbar";
+import { useAuth } from '../../../App';
 import HeroSection from "../../HeroSection/HeroSection";
 import Features from "../../Features/Features";
 import Whatweoffer from "../../offering/whatweoffer";
@@ -14,10 +14,11 @@ import FAQSection from "@/components/FAQ/faqQuestion";
 import Footer from "../../Footer/footer";
 
 export default function BrandHiring() {
+  const { isAuthenticated, userType } = useAuth();
   const navigate = useNavigate();
   return (
     <>
-      <Navbar backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" />
+      <Navbar isAuthenticated={isAuthenticated} userType={userType} backgroundColor="bg-gradient-to-r from-blue-800 to-green-900" />
         <div
           className="relative w-full lg:h-[650px] h-[570px] bg-cover bg-center bg-no-repeat border-blue-900 flex items-center"
           style={{ backgroundImage: `url(${brandHiringImage})` }}

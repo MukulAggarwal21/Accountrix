@@ -4,11 +4,11 @@ import Navbar from '../Navbar'
 import { useAuth } from '../../App'
 
 export default function LandingMain() {
-  const { login } = useAuth();
+  const { isAuthenticated, userType, login } = useAuth();
 
   return (
     <>
-      <Navbar/>
+      <Navbar isAuthenticated={isAuthenticated} userType={userType} />
 
     <main className="relative z-5 flex flex-col lg:flex-row sm:ml-10 lg:ml-28 justify-center items-center px-6  py-16 lg:h-[calc(100vh-76px)] w-full max-w-7xl  gap-20">
 
